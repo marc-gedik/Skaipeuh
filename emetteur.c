@@ -15,7 +15,7 @@ int main(){
   bzero(&addr, sizeof(addr));
   
   addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = INADDR_ANY;
+  addr.sin_addr.s_addr = inet_addr("225.1.2.4");
   addr.sin_port = htons(28888);
   
   sendto(socket_desc, msg, strlen(msg), 0, (struct sockaddr *)&addr, sizeof(addr));

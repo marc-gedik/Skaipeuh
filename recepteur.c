@@ -34,6 +34,6 @@ int main(){
   printf("Recev : \n");
   recv(socket_desc, msg, 256, 0);
   printf("%s\n", msg);
-  
+  sendto(socket_desc, "IAM user... machine", 56, 0, (struct sockaddr *)&addr, sizeof(addr));
   return EXIT_SUCCESS;
 }
