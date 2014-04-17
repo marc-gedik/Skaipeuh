@@ -2,7 +2,7 @@ import  java.net.*;
 import java.io.*;
 import java.util.Scanner;
 
-class ClientTCP{
+class ClientTCP2{
 
     public static void main(String[] args)throws InterruptedException{
 	int PORTLIS=0;
@@ -40,11 +40,11 @@ class ClientTCP{
 		}
 		else{
 
-		    Socket s = new Socket( "localhost" , PORTLIS);
-		    BufferedReader bf = new BufferedReader (new InputStreamReader(s.getInputStream()));
-		    System.out.println("attend lecture");		
+		    //Socket s = new Socket( "localhost" , PORTLIS);
+		    // BufferedReader bf = new BufferedReader (new InputStreamReader(s.getInputStream()));
 
-		    System.out.println(bf.readLine());
+		    // System.out.println(bf.readLine());
+		    System.out.println("pb");		
 	
 		    Thread.sleep(1000);
 
