@@ -2,6 +2,24 @@ import java.net.*;
 
 public class Recepteur{
     
+
+
+    public static void reponseRecepteur(){
+	try{
+	String rep= "IAM user machine port";
+	DatagramSocket ds = new DatagramSocket(); 
+	InetAddress ia = InetAddress.getByName("224.5.6.7"); 
+	DatagramPacket dp = new DatagramPacket(rep.getBytes(), 
+					       rep.getBytes().length,
+					       ia,
+					       61234); 
+	ds.send(dp); 
+	} catch(Exception e) { 
+	    e.printStackTrace(); 
+	}
+    }
+
+
     public static void main(String args[]) { 
 	try { 
 	    String msg;	  
@@ -16,6 +34,9 @@ public class Recepteur{
 				 0,
 				 dp.getLength()); 
 		System.out.println("Message recu:  "+ msg); 
+	    
+		if(msg.startsWith("HLO"))
+		    reponseRecepteur();
 	    } 
 	} catch(Exception e) { 
 	    e.printStackTrace(); 
