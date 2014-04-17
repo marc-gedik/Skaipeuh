@@ -1,8 +1,23 @@
+#include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+
+#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <netdb.h>
 
 #include <poll.h>
+
+#define MAX_LINE 500
+
+char * int_to_string(int n, int size){
+  int i;
+  
+  for(i = 0; i < size; i ++){
+    
+  }
+}
 
 int createSocket(int port, char* addresse){
   struct sockaddr_in addr;
@@ -40,13 +55,13 @@ int createServerSocket(int port){
   return sock;
 }
 
-void * chat (int portServeur, int portClient){
+void chat (int portServeur, int portClient){
   struct sockaddr_in c;
   int sock_serv, sock, s;
   unsigned int csize;
   struct pollfd polls[2]; 
   
-  char buff[50];
+  char buff[MAX_LINE + 4 + 4];
 
   sock_serv = createServerSocket(portServeur);
   s = createSocket(portClient, "127.0.0.1");
@@ -64,16 +79,19 @@ void * chat (int portServeur, int portClient){
   while(1){
     poll(polls, 2, -1);
     if(polls[0].revents == POLLIN){
-      fgets(buff, 50, stdin);
-      write(s, buff, 50);
+      fgets(buff, MAX_LINE, stdin);
+      write(s, buff, MAX_LINE);
     }
     if(polls[1].revents == POLLIN){
-      read(sock, buff, 50);
+      read(sock, buff, MAX_LINE);
       printf("recu>%s", buff);
     }
   }
 }
 
-int main(int argc, int ** argv){
+int main(int argc, char ** argv){
   chat(atoi(argv[1]), atoi(argv[2]));
+  
+  exit(EXIT_SUCCESS);
 }
+
