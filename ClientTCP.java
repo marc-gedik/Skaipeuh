@@ -5,56 +5,31 @@ import java.util.Scanner;
 class ClientTCP{
 
     public static void main(String[] args)throws InterruptedException{
-	int PORTLIS=0;
-	int PORTWRI=0;
+	int PORT = 0;
 
-	if(args.length==2){
-	    PORTLIS=Integer.parseInt(args[0]);
-	    PORTWRI=Integer.parseInt(args[1]);
+	if(args.length==1){
+	    PORT=Integer.parseInt(args[0]);
+	   
 	}
 	else{
-	    System.out.println("manque les ports ");
+	    System.out.println("manque le port ");
 	    System.exit(0);
 	}
 
-
-
-
-
-
-	BufferedInputStream text = new BufferedInputStream(System.in);
-	String msg ;
-	while(true){
-
-	    try {
-		if(text.available()>0){
-		    Scanner sc = new Scanner(System.in);
-		    msg = sc.next();
-		    System.out.println("je lis :" + msg);
-		    Socket s = new Socket( "localhost" , PORTWRI);
-		    PrintWriter pw = new PrintWriter (new OutputStreamWriter(s.getOutputStream()));
-		    pw.println(msg);
-		    pw.flush();
-		    System.out.println("j'envoie");
-
-		}
-		else{
-
-		    Socket s = new Socket( "localhost" , PORTLIS);
-		    BufferedReader bf = new BufferedReader (new InputStreamReader(s.getInputStream()));
-		    System.out.println("attend lecture");		
-
-		    System.out.println(bf.readLine());
 	
-		    Thread.sleep(1000);
+        ThreadWRI lec = new ThreadWRI(PORT);		
+	Thread t1 = new Thread(lec);
+       
+	ThreadLIS wri = new ThreadLIS(PORT);		
+	Thread t2 = new Thread(wri);
 
-		    System.out.println("je fais autre chose");
-		}
-	    
-	} catch (IOException e) {
-	    System.out.println("Probleme avec le Scanner");
-	}
+	t1.start();
+	t2.start();
     }
+}
+
+
+    
 
 
 
@@ -82,5 +57,4 @@ class ClientTCP{
 	
       }
       }*/
-}
-}
+

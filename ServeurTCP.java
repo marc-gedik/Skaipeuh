@@ -6,39 +6,43 @@ class ServeurTCP{
 
     public static void main(String[] args){
 
+	int PORT=0;	
+	if(args.length==1){
+	    PORT=Integer.parseInt(args[0]);
+	}
+	else{
+	    System.out.println("manque les ports ");
+	    System.exit(0);
+	}
+
+
 	try{
+	
+	ServerSocket ss = new ServerSocket(PORT);
+	Socket sRcv, sSent;
+	sSent= ss.accept();
+	sRcv= ss.accept();
 
-	    ServerSocket ssRcv = new ServerSocket(60000);
-	    ServerSocket ssSent = new ServerSocket(60001);
-	    Socket sRcv, sSent;
-	    sSent= ssSent.accept();
-	    sRcv= ssRcv.accept();
 
-	    BufferedReader br;
-	    PrintWriter pw;
-	    String msg;
-	  
-	    while(true){
-		br = new BufferedReader(new InputStreamReader(sRcv.getInputStream()));
-		System.out.println("attend");;
 
-		msg = br.readLine();
-		System.out.println(msg);	
-        
-		pw = new PrintWriter(new OutputStreamWriter(sSent.getOutputStream()));
-		pw.println(msg);
-		pw.flush();
-	      		System.out.println("fini");;
+	ServeurThread lec = new ServeurThread(sSent , sRcv);		
+	Thread t1 = new Thread(lec);
+       
+	ServeurThread wri = new ServeurThread(sRcv, sSent);		
+	Thread t2 = new Thread(wri);
 
-	    }
+	t1.start();
+	t2.start();
+	} catch (IOException e) {
+	    System.out.println("Erreur ServeurTCP");
+	}
+
 	    //sSent.close();
 	    //sRcv.close();
 	}
 
-	catch(java.io.IOException e){
-	    System.out.println(e);
-	}
-    }
+
+    
 }
 
 
