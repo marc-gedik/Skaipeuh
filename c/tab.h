@@ -1,7 +1,7 @@
 struct personne{
-  char nom[8];
+  char nom[9];
   int port;
-  char adr[15];
+  char adr[16];
 };
 
 struct personnes {
@@ -9,3 +9,11 @@ struct personnes {
   int size;
   int nbr;
 };
+
+void print(struct personnes * t);
+struct personnes create();
+void add(struct personnes * t, char* nom, int port, char * adr);
+void split_and_add(struct personnes *t, char * s);
+void del(struct personnes * t, int pos);
+struct personne * get(struct personnes * t, int pos);
+

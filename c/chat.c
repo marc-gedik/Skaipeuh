@@ -28,7 +28,7 @@ int createSocket(int port, char* adresse){
   addr.sin_family = AF_INET;
   addr.sin_port = htons(port);
   addr.sin_addr.s_addr = inet_addr(adresse);
-  
+
   connect(sock, (struct sockaddr *)&addr, sizeof(addr));
   perror("client");
   return sock;

@@ -41,8 +41,9 @@ void add(struct personnes * t, char* nom, int port, char * adr){
 
 void split_and_add(struct personnes *t, char * s){
   struct personne p;
-  
+
   strncpy(p.nom, s + 4, 8);
+  p.nom[8] = '\0';
   strncpy(p.adr, s + 13, 15);
 
   p.port = atoi(s + 29);
@@ -57,6 +58,12 @@ void del(struct personnes * t, int pos){
   t->nbr --;
 }
 
+struct personne * get(struct personnes * t, int pos){
+  if(pos > t->nbr)
+    return NULL;
+  else 
+    return t->tab+pos;
+}
 void print(struct personnes * t){
   int i;
   for(i=0; i < t->nbr; i++){

@@ -33,3 +33,22 @@ void string_bourrage(char* str, int size, char* s){
 int firstThreeLetters(char * s1, char * s2){
   return s1[0] == s2[0] && s1[1] == s2[1] && s1[2] == s2[2];
 }
+
+char * getip(){
+  char * ip = (char *)malloc(sizeof(char) * 15);
+  char buff[256];
+  struct hostent * machine;
+    
+  gethostname(buff, 500);
+  
+  machine = gethostbyname(buff);
+
+  int_bourrage((unsigned char)machine->h_addr[0], 3, ip);
+  int_bourrage((unsigned char)machine->h_addr[1], 3, ip + 4);
+  int_bourrage((unsigned char)machine->h_addr[2], 3, ip + 8);
+  int_bourrage((unsigned char)machine->h_addr[3], 3, ip + 12);
+  
+  *(ip + 3) = *(ip + 7) = *(ip + 11) = '.';
+
+  return ip;
+}

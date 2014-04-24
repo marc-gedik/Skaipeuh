@@ -12,6 +12,7 @@
 
 #include "chat.h"
 #include "tools.h"
+#include "tab.h"
 
 #define IS_HLO(s) firstThreeLetters(s, "HLO")
 #define IS_IAM(s) firstThreeLetters(s, "IAM")
@@ -49,11 +50,18 @@ int main(int argc, char ** args){
   int sock_recep, sock_emet, sock_serv, sock_a, sock_b, sock_client;
   struct sockaddr_in addr, c;
   struct pollfd polls[3];
-  int ready, n;
+  struct personnes p;
+  struct personne *personne;
+  int ready, n, firstHLO;
   unsigned int csize;
   pthread_t tclient;
-  char msg[256];
+  char msg[35];
+  char iam_msg[35];
+  char * ip;
 
+  p = create();
+  ip = getip();
+  
   csize = sizeof(c);
 
   sock_emet = socket(AF_INET, SOCK_DGRAM, 0);
@@ -66,9 +74,21 @@ int main(int argc, char ** args){
 
   sock_recep = createRecepteur(28888, "225.1.2.4"); 
   
-  sock_serv = createServerSocket(atoi(args[1]));
+  sock_serv = createServerSocket(atoi(args[2]));
 
-  sendto(sock_emet, "HLO user", 15, 0, (struct sockaddr *)&addr, sizeof(addr));
+  strcpy(iam_msg, "HLO ");
+  iam_msg[4] = ' ';
+  string_bourrage(args[1], 8, iam_msg +4);
+  iam_msg[12] = ' ';
+  strcpy(iam_msg + 13, ip);
+  iam_msg[28] = ' ';
+  int_bourrage(atoi(args[2]), 5, iam_msg + 29);
+
+  sendto(sock_emet, iam_msg, 34, 0, (struct sockaddr *)&addr, sizeof(addr));
+
+  iam_msg[0] = 'I';
+  iam_msg[1] = 'A';
+  iam_msg[2] = 'M';
 
   polls[0].fd = 0;
   polls[0].events = POLLIN;
@@ -78,16 +98,23 @@ int main(int argc, char ** args){
 
   polls[2].fd = sock_recep;
   polls[2].events = POLLIN;
-
+  
+  firstHLO = 0;
+  
   while(1){
     ready = poll(polls, 3, -1);
+
     while(ready --){
       if(polls[0].revents == POLLIN){
 	scanf("%d", &n);
-	printf("Connection a %d\n", n);
-	sock_client = createSocket(n, "127.0.0.1"); 
-	client(sock_client);
+	personne = get(&p, n);
+	if(personne == NULL)
+	  break;
 	
+	sock_client = createSocket(personne->port, personne->adr); 
+	printf("%d %s\n", personne->port, personne->adr);
+	client(sock_client);
+	printf("retour de chat\n");
 	//retour de chat
 	sendto(sock_emet, "RFH", 3, 0, (struct sockaddr *)&addr, sizeof(addr));
 	
@@ -95,7 +122,7 @@ int main(int argc, char ** args){
       if(polls[1].revents == POLLIN){
 	printf("Accept\n");
 	sock_a = accept(sock_serv, (struct sockaddr *)(&c), &csize);
-	sock_client = createSocket(atoi(args[1]), "127.0.0.1");
+	sock_client = createSocket(atoi(args[2]), "127.0.0.1");
 	pthread_create(&tclient, NULL, thread_client, (void *)(&sock_client));
 
 	sock_b = accept(sock_serv, (struct sockaddr *)(&c), &csize);
@@ -107,12 +134,24 @@ int main(int argc, char ** args){
       }
       if(polls[2].revents == POLLIN){
 	recv(sock_recep,  msg, 256, 0);
-	printf("recv: %s\n", msg);
+
 	if(IS_HLO(msg) || IS_RFH(msg)){
-	  sendto(sock_emet, "IAM ...", 15, 0, (struct sockaddr *)&addr, sizeof(addr));
+	  if(firstHLO){
+	    printf("\033c");
+	    split_and_add(&p,msg);
+	    print(&p);
+	    sendto(sock_emet, iam_msg, 34, 0, (struct sockaddr *)&addr, sizeof(addr));
+	    firstHLO = 1;
+	  }
+	  if(firstHLO < 2)
+	    firstHLO ++;
 	}
 	else if(IS_IAM(msg)){
-	  //TODO
+	  if(firstHLO < 2){
+	    printf("\033c");
+	    split_and_add(&p,msg);
+	    print(&p);
+	  }
 	}
       }
     }
