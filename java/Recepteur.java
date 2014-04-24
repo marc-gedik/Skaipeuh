@@ -2,10 +2,19 @@ import java.net.*;
 
 public class Recepteur implements Runnable{
     
-    
-    String IAM;
+    String[] tabClients = new String[100];
+    int indice = 0;
+    String msgIAM;
+
     public Recepteur(String msg){
-	this.IAM = msg;
+	this.msgIAM = msg;
+    }
+
+
+    public void afficheClientConnect(){
+	int i;
+	for(i=0; i<indice; i++)
+	    System.out.println(tabClients[i]);
     }
 
 
@@ -29,6 +38,7 @@ public class Recepteur implements Runnable{
 
     public void run() { 
 	try { 
+
 	    String msg;	  
 	    byte [] buff = new byte[256]; 
 	    InetAddress ia = InetAddress.getByName("224.5.6.7"); 
@@ -40,13 +50,18 @@ public class Recepteur implements Runnable{
 	        msg = new String(dp.getData() ,
 				 0,
 				 dp.getLength()); 
-	    
+		//	System.out.println("Message recu:  "+ msg );
+
+	
 		if(msg.startsWith("HLO")){
 		    System.out.println("Message recu:  "+ msg + 
-				       "\nJ'envoie le message: " + IAM); 
-
-		    reponseRecepteur(IAM);
+				       "\nJ'envoie le message: " + msgIAM); 
+		    tabClients[indice]=msg;
+		    indice ++;
+		    reponseRecepteur(msgIAM);
 		}
+	    
+
 	    } 
 	} 
 	catch(Exception e) { 
