@@ -1,11 +1,9 @@
 import  java.net.*;
 import java.io.*;
-import java.util.Scanner;
 
 class ServeurTCP{
 
     public static void main(String[] args){
-
 	int PORT=0;	
 	if(args.length==1){
 	    PORT=Integer.parseInt(args[0]);
@@ -15,34 +13,24 @@ class ServeurTCP{
 	    System.exit(0);
 	}
 
-
 	try{
-	
-	ServerSocket ss = new ServerSocket(PORT);
-	Socket sRcv, sSent;
-	sSent= ss.accept();
-	sRcv= ss.accept();
+	    ServerSocket ss = new ServerSocket(PORT);
+	    Socket sRcv, sSent;
+	    sSent= ss.accept();
+	    sRcv= ss.accept();
 
+	    ServeurThread read = new ServeurThread(sSent, sRcv);		
+	    Thread t1 = new Thread(read);       
+	    ServeurThread wri = new ServeurThread(sRcv, sSent);		
+	    Thread t2 = new Thread(wri);
 
-
-	ServeurThread lec = new ServeurThread(sSent , sRcv);		
-	Thread t1 = new Thread(lec);
-       
-	ServeurThread wri = new ServeurThread(sRcv, sSent);		
-	Thread t2 = new Thread(wri);
-
-	t1.start();
-	t2.start();
-	} catch (IOException e) {
-	    System.out.println("Erreur ServeurTCP");
-	}
-
-	    //sSent.close();
-	    //sRcv.close();
-	}
-
-
-    
+	    t1.start();
+	    t2.start();
+	} 
+	catch (IOException e) {
+	    System.out.println("Erreur ServeurTCP\n" + e);
+	}	
+    }
 }
 
 

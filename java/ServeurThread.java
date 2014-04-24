@@ -16,7 +16,6 @@ public class ServeurThread implements Runnable{
     }
     
     
-
     public void run(){
 	try{
 
@@ -27,20 +26,15 @@ public class ServeurThread implements Runnable{
 	    pw = new PrintWriter(new OutputStreamWriter(s2.getOutputStream()));
 	    
 	    while(true){
-		System.out.println("attend");
+		System.out.println("En attente ...");
 		msg = br.readLine();
-		System.out.println(msg);	
-        
+		System.out.println(msg);	        
 		pw.println(msg);
 		pw.flush();
-		System.out.println("fini");
-
 	    }
 	}
-    
-
 	catch(java.io.IOException e){
-	    System.out.println("Erreur serveur thread"+e);
+	    System.out.println("Erreur ServeurThread\n"+e);
 	}
     }
 }
