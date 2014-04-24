@@ -5,7 +5,9 @@
 #include "tab.h"
 
 void increase_size(struct personnes * t){
-  //Doubler la taille
+  printf("Double\n");
+  t->size *= 2;
+  t->tab = realloc(t->tab, sizeof(struct personne) * t->size);
 }
 
 struct personnes create(){
@@ -22,9 +24,8 @@ void add_personne(struct personnes *t, struct personne p){
   if(t->size == t->nbr){
     increase_size(t);
   }
-  printf("%s\n", p.nom);
-  t->tab[t->nbr++] = p;
 
+  t->tab[t->nbr++] = p;
 }
 
 void add(struct personnes * t, char* nom, int port, char * adr){
@@ -46,7 +47,6 @@ void split_and_add(struct personnes *t, char * s){
 
   p.port = atoi(s + 29);
 
-  p.nom[8] = '\0';
   add_personne(t, p);
 }
 
@@ -62,20 +62,4 @@ void print(struct personnes * t){
   for(i=0; i < t->nbr; i++){
     printf("%d. %s - %d - %s\n", i, t->tab[i].nom, t->tab[i].port, t->tab[i].adr);
   }
-}
-
-int main(){
-  struct personnes p;
-  
-  p = create();
-  add(&p, "num1    ", 1, "192.0.0.1");
-  add(&p, "num2", 2, "192.0.0.2");
-  add(&p, "num3", 3, "192.0.0.3");
-  add(&p, "num4", 4, "192.0.0.4");
-  add(&p, "num5", 5, "192.0.0.5");
-  split_and_add(&p, "HLO yunes123 192.003.001.222 50000");
-  del(&p, 4);
-  print(&p);
-  
-  return 0;
 }
