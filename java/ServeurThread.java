@@ -26,7 +26,7 @@ public class ServeurThread implements Runnable{
 	    pw = new PrintWriter(new OutputStreamWriter(s2.getOutputStream()));
 	    
 	    while(true){
-		System.out.println("En attente ...");
+		System.out.println("Serveur en attente ...");
 		msg = br.readLine();
 		System.out.println(msg);	        
 		pw.println(msg);

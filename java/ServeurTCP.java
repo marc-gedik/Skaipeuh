@@ -5,6 +5,7 @@ import java.io.*;
 class ServeurTCP implements Runnable{
 
     int PORT;
+    static boolean accept = false;
 
     public ServeurTCP(int p){
 	this.PORT = p; 
@@ -14,8 +15,11 @@ class ServeurTCP implements Runnable{
 	try{
 	    ServerSocket ss = new ServerSocket(PORT);
 	    Socket sRcv, sSent;
-	    sSent= ss.accept();
 	    sRcv= ss.accept();
+	    accept=true;
+	    System.out.println("Une personne souhaite vous parler");
+	    sSent= ss.accept();
+	    System.out.println("Connection etablie");
 
 	    ServeurThread read = new ServeurThread(sSent, sRcv);		
 	    Thread t1 = new Thread(read);       

@@ -21,7 +21,7 @@ public class ThreadREAD implements Runnable{
 	    }
 	}
 	catch (IOException e) {
-	    System.out.println("ThreadREAD\n" + e);
+	    System.out.println("Erreur ThreadREAD\n" + e);
 	}
     }
 }
