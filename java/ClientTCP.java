@@ -1,21 +1,20 @@
 import  java.net.*;
 import java.io.*;
 
-class ClientTCP{
+public class ClientTCP implements Runnable{
 
-    public static void main(String[] args){
-	int PORT = 0;
-	if(args.length==1){
-	    PORT=Integer.parseInt(args[0]);	   
-	}
-	else{
-	    System.out.println("manque le port ");
-	    System.exit(0);
-	}
+    int PORT;
+
+    public ClientTCP(int p){
+	this.PORT=p;
+    }
+
+
+    public void run(){
 
 	try{
 	    Socket s = new Socket("localhost" , PORT);
-	    
+
 	    ThreadWRI wri = new ThreadWRI(PORT,s);		
 	    Thread t1 = new Thread(wri);
 	    ThreadREAD read = new ThreadREAD(PORT, s);		

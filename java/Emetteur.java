@@ -2,10 +2,22 @@ import java.net.*;
 
 
 public class Emetteur {
-    
-    public static void main(String args[]) { 
+    String type;
+    String user;
+    String machine;
+    String port;
+
+    public Emetteur(String type, String user, String machine, String port){
+	this.type = type;
+	this.user=user;
+	this.machine=machine;
+	this.port=port;
+    }
+
+
+    public void lance() { 
 	try { 
-	    String msg = "HLO user machine port"; 
+	    String msg = type + " "+ user + " " + machine + " " +port; 
 	    DatagramSocket ds = new DatagramSocket(); 
 	    InetAddress ia = InetAddress.getByName("224.5.6.7"); 
 	    DatagramPacket dp = 
@@ -14,7 +26,7 @@ public class Emetteur {
 				   ia,
 				   61234); 
 	    ds.send(dp); 
-	    System.out.println("Envoi du message HLO"); 
+	    System.out.println(msg); 
 	} catch(Exception e) { 
 	    e.printStackTrace(); 
 	}

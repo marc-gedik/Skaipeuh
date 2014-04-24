@@ -21,7 +21,7 @@ public class ThreadWRI implements Runnable{
 	    while(true){
 		Scanner sc = new Scanner(System.in);
 		msg = sc.nextLine();
-		//	System.out.println("j'envoi ça :" + msg);
+		//    System.out.println("j'envoi ça :" + msg);
 		pw.println(msg);
 		pw.flush();	
 	    }

@@ -1,18 +1,16 @@
 import  java.net.*;
 import java.io.*;
 
-class ServeurTCP{
 
-    public static void main(String[] args){
-	int PORT=0;	
-	if(args.length==1){
-	    PORT=Integer.parseInt(args[0]);
-	}
-	else{
-	    System.out.println("manque les ports ");
-	    System.exit(0);
-	}
+class ServeurTCP implements Runnable{
 
+    int PORT;
+
+    public ServeurTCP(int p){
+	this.PORT = p; 
+    }
+
+    public void run(){
 	try{
 	    ServerSocket ss = new ServerSocket(PORT);
 	    Socket sRcv, sSent;
