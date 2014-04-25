@@ -19,6 +19,14 @@ public class TabUser{
     }
     
 
+    public void clearTabUser(){
+	int i;
+	for(i=0; i<nbEle; i++)
+	    tabUser[i]="";
+	nbEle=0;
+
+    }
+
     public void addUser(String user) {
 	if(tabUser.length == nbEle){
 	    int i;
@@ -47,7 +55,7 @@ public class TabUser{
 		}
 	    }
 	    for(j=i; j<nbEle; j++){
-		System.out.println("if");
+		//	System.out.println("if");
 		tabUser[j] =tabUser[j+1];
 	    }
 	}
@@ -70,8 +78,8 @@ public class TabUser{
 	t.addUser("HLO safir    192.168.000.014 01234");
 	t.addUser("HLO safir    192.168.000.014 01234");
 	t.addUser("HLO marc    192.168.000.014 01234");
-
-	t.removeUser("marc    ");
+	System.out.println(t.nbEle);
+	//t.removeUser("marc    ");
 	t.afficheUserConnect();
 
     }

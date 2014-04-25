@@ -28,7 +28,7 @@ public class ServeurThread implements Runnable{
 	    while(true){
 		System.out.println("Serveur en attente ...");
 		msg = br.readLine();
-		System.out.println(msg);	        
+		//	System.out.println(msg);	        
 		pw.println(msg);
 		pw.flush();
 	    }

@@ -42,7 +42,7 @@ public class Emetteur {
 				   ia,
 				   61234); 
 	    ds.send(dp); 
-	    System.out.println(msg); 
+	    //System.out.println(msg); 
 	} catch(Exception e) { 
 	    e.printStackTrace(); 
 	}
