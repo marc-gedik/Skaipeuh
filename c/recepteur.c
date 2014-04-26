@@ -10,6 +10,8 @@
 #include <poll.h>
 #include <pthread.h>
 
+#include <unistd.h>
+
 #include "chat.h"
 #include "tools.h"
 #include "tab.h"
@@ -19,6 +21,8 @@
 #define IS_BYE(s) firstThreeLetters(s, "BYE")
 #define IS_RFH(s) firstThreeLetters(s, "RFH")
 #define IS_BAN(s) firstThreeLetters(s, "BAN")
+
+#define MAX_LINE 256
 
 int createRecepteur(int port, char* adresse){
   int sock;
@@ -48,16 +52,20 @@ int createRecepteur(int port, char* adresse){
 
 int main(int argc, char ** args){
   int sock_recep, sock_emet, sock_serv, sock_a, sock_b, sock_client;
-  struct sockaddr_in addr, c;
+  struct sockaddr_in addr, c, from;
+  char * ban = NULL;
   struct pollfd polls[3];
   struct personnes p;
   struct personne *personne;
-  int ready, n, acceptIAM;
+  int ready, n, acceptIAM, lu;
   unsigned int csize;
   pthread_t tclient;
   char msg[35];
   char iam_msg[35];
+  char buff[MAX_LINE];
   char * ip;
+  socklen_t lg;
+  char me[9];
 
   p = create();
   ip = getip();
@@ -75,6 +83,9 @@ int main(int argc, char ** args){
   sock_recep = createRecepteur(28888, "225.1.2.4"); 
   
   sock_serv = createServerSocket(atoi(args[2]));
+
+  string_bourrage(args[1], 8, me);
+  me[8] = '\0';
 
   strcpy(iam_msg, "HLO ");
   iam_msg[4] = ' ';
@@ -110,9 +121,10 @@ int main(int argc, char ** args){
 
     while(ready --){
       if(polls[0].revents == POLLIN){
-	scanf("%d", &n);
+	lu = read(STDIN_FILENO, buff, MAX_LINE);
+	buff[lu - 1] = '\0';
 
-	if(n == -1){
+	if(strcmp(buff, "/q") == 0 || strcmp(buff, "/quit") == 0){
 	  iam_msg[0] = 'B';
 	  iam_msg[1] = 'Y';
 	  iam_msg[2] = 'E';
@@ -120,51 +132,77 @@ int main(int argc, char ** args){
 	  sendto(sock_emet, iam_msg, 34, 0, (struct sockaddr *)&addr, sizeof(addr));
 	  exit(EXIT_SUCCESS);
 	}
+	else if(strlen(buff) > 4
+		&& strncmp("ban", buff, 3) == 0){
+	  msg[0] = 'B', msg[1] = 'A', msg[2] = 'N', msg[3] = ' ';
+	  string_bourrage(buff + 4, 8, msg + 4);
+	  msg[12] = '\0';
 
-	personne = get(&p, n);
+	  sendto(sock_emet, msg, 12, 0, (struct sockaddr *)&addr, sizeof(addr));
+	}
+	else{
+	  n = atoi(buff);
+	  personne = get(&p, n);
 
-	if(personne == NULL){
-	  printf("\033c");
-	  print(&p);
+	  if(personne == NULL){
+	    printf("\033c");
+	    print(&p);
 	  
-	  printf("\nIl n'y a pas de personne %d\n", n);
-	  break;
-	}
-	sock_client = createSocket(personne->port, personne->adr);
-	if(sock_client == -1){
-	  printf("\033c");
-	  print(&p);
+	    printf("\nIl n'y a pas de personne %d\n", n);
+	    break;
+	  }
+	  sock_client = createSocket(personne->port, personne->adr);
+	  if(sock_client == -1){
+	    printf("\033c");
+	    print(&p);
 	  
-	  printf("Impossible de se connecter a %d\n", n);
-	  break;
+	    printf("Impossible de se connecter a %d\n", n);
+	    break;
+	  }
+	  printf("Connection etablie avec %s \n", personne->nom);
+	  client(sock_client);
+	  printf("retour de chat\n");
+	  //retour de chat
+	  sendto(sock_emet, "RFH\0", 4, 0, (struct sockaddr *)&addr, sizeof(addr));
 	}
-	printf("Connection etablie avec %s \n", personne->nom);
-	client(sock_client);
-	printf("retour de chat\n");
-	//retour de chat
-	sendto(sock_emet, "RFH\0", 4, 0, (struct sockaddr *)&addr, sizeof(addr));
-	
       }
       if(polls[1].revents == POLLIN){
-	printf("Accept\n");
 	sock_a = accept(sock_serv, (struct sockaddr *)(&c), &csize);
 	sock_client = createSocket(atoi(args[2]), "127.0.0.1");
 	pthread_create(&tclient, NULL, thread_client, (void *)(&sock_client));
 
 	sock_b = accept(sock_serv, (struct sockaddr *)(&c), &csize);
-	printf("Accepter\n");
+	printf("Quelqu'un souhaite vous parler : \n");
 	serveur(sock_a, sock_b);
-	printf("retour de chat\n");
+	
 
 
       }
       if(polls[2].revents == POLLIN){
-	recv(sock_recep,  msg, 34, 0);
+	recvfrom(sock_recep,  msg, 34, 0, (struct sockaddr *)(&from), &lg);
 
-	if(strcmp(msg+3, iam_msg+3) == 0)
+	if(IS_BAN(msg)){
+	  msg[12] = '\0';
+	  if(strcmp(msg + 4, me) == 0){
+	    if(ban == NULL){ 
+	      ban = inet_ntoa(from.sin_addr);
+	      printf("Une personne veut vous bannir\n");
+	    }
+	    else if(strcmp(inet_ntoa(from.sin_addr), ban) != 0){
+	      printf("Vous avez été banni\n");
+	      
+	      iam_msg[0] = 'B';
+	      iam_msg[1] = 'Y';
+	      iam_msg[2] = 'E';
+	      
+	      sendto(sock_emet, iam_msg, 34, 0, (struct sockaddr *)&addr, sizeof(addr));
+	      exit(EXIT_SUCCESS);
+	    }
+	  }
+	}
+	else if(strcmp(msg+3, iam_msg+3) == 0)
 	  break;
-
-	if(IS_HLO(msg)){
+	else if(IS_HLO(msg)){
 	  acceptIAM = 0;
 	  split_and_add(&p,msg);
 	  printf("\033c");
@@ -185,7 +223,6 @@ int main(int argc, char ** args){
 	  split_and_del(&p, msg);
 	  printf("\033c");
 	  print(&p);
-
 	}
       }
     }

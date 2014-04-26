@@ -81,7 +81,6 @@ int createServerSocket(int port){
 void client(int sock){
   struct pollfd polls[2]; 
   int len, n, port, desc;
-  char c;
   struct stat statbuf; 
   int filesize;
   char buff[MAX_LINE + 4 + 4];
@@ -150,7 +149,7 @@ void client(int sock){
 	buff[4] = '\0';
 	len = atoi(buff);
 	read(sock, buff, len);
-
+	buff[len] = '\0';
 	printf("%s\n", buff);
       }
       else if(IS_CLO(buff)){
@@ -159,8 +158,9 @@ void client(int sock){
       }
       else if(IS_FIL(buff)){
 	printf("Acceptez le fichier ?(y/n)\n");
-	scanf("%c", &c);
-	if(c == 'y'){
+	n = read(STDIN_FILENO, buff, MAX_LINE);
+	
+	if(buff[0] == 'y'){
 	  write(sock, "ACK", 3);
 	  printf("lancement de l'echange ...\n");
 	  //lancer le serveur en thread
