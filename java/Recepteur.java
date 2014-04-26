@@ -1,34 +1,26 @@
 import java.net.*; 
 
 public class Recepteur implements Runnable{
-    
-    String[] tabClients = new String[100];
-    int indice = 0;
+    TabUser tab = new TabUser();
     String msgIAM;
+    String user;
 
     public Recepteur(String msg){
 	this.msgIAM = msg;
+	this.user=msgIAM.substring(4, 12);
     }
-
-
-    public void afficheClientConnect(){
-	int i;
-	for(i=0; i<indice; i++)
-	    System.out.println(tabClients[i]);
-    }
-
 
 
     public static void reponseRecepteur(String rep){
 	try{
 
-	DatagramSocket ds = new DatagramSocket(); 
-	InetAddress ia = InetAddress.getByName("224.5.6.7"); 
-	DatagramPacket dp = new DatagramPacket(rep.getBytes(), 
-					       rep.getBytes().length,
-					       ia,
-					       61234); 
-	ds.send(dp); 
+	    DatagramSocket ds = new DatagramSocket(); 
+	    InetAddress ia = InetAddress.getByName("224.5.6.7"); 
+	    DatagramPacket dp = new DatagramPacket(rep.getBytes(), 
+						   rep.getBytes().length,
+						   ia,
+						   61234); 
+	    ds.send(dp); 
 	} 
 	catch(Exception e) { 
 	    System.out.println("Erreur reponseRecepteur\n" +e );
@@ -38,32 +30,76 @@ public class Recepteur implements Runnable{
 
     public void run() { 
 	try { 
-
-	    String msg;	  
+	    String msg;
+	    String tmp="";
 	    byte [] buff = new byte[256]; 
 	    InetAddress ia = InetAddress.getByName("224.5.6.7"); 
 	    MulticastSocket ms = new MulticastSocket(61234); 
 	    ms.joinGroup(ia); 
-	    DatagramPacket dp = new DatagramPacket(buff, buff.length); 
+	    DatagramPacket dp = new DatagramPacket(buff, buff.length);
+	    boolean flag1= true;
+	    InetAddress bannisseur1 =null;
+	    InetAddress bannisseur2 =null;
+
 	    while (true) { 
 		ms.receive(dp); 
-	        msg = new String(dp.getData() ,
-				 0,
-				 dp.getLength()); 
-		//	System.out.println("Message recu:  "+ msg );
+		msg = new String(dp.getData(), 0, dp.getLength());
+
+		if(!(msg.substring(4).equals(msgIAM.substring(4)))){
+						
+		    if(msg.startsWith("HLO")){
+			flag1=false;
+
+			System.out.println("HLO reçu j'envoie: " + msgIAM); 
+			tab.addUser(msg);
+			reponseRecepteur(msgIAM);
+		    }			
+
+
+
+		
+		    if(msg.startsWith("IAM") && flag1){	    
+			tab.addUser(msg);
+		    }
+		  
+
 
 	
-		if(msg.startsWith("HLO")){
-		    System.out.println("Message recu:  "+ msg + 
-				       "\nJ'envoie le message: " + msgIAM); 
-		    tabClients[indice]=msg;
-		    indice ++;
-		    reponseRecepteur(msgIAM);
-		}
-	    
+		    if(msg.startsWith("RFH")){	    
+			tab.clearTabUser();
+			flag1=true;
+			reponseRecepteur(msgIAM);  
+		    }
 
-	    } 
-	} 
+
+
+
+
+		    if(msg.startsWith("BYE")){
+			System.out.println("Message recu:  "+ msg); 
+			tab.removeUser(msg.substring(4, 12));
+		    }
+		   
+
+
+
+		    if(msg.equals("BAN "+ user)){
+			System.out.println("Message recu:  "+ msg); 
+			if(bannisseur1==null){
+			    bannisseur1=dp.getAddress();
+			}
+			else{
+			    bannisseur2=dp.getAddress();
+			    if((bannisseur2.equals(bannisseur1))){
+				reponseRecepteur("BYE "+user);
+				System.exit(0);
+			    }
+			}
+		    }   
+		}
+	    }
+	}
+	
 	catch(Exception e) { 
 	    System.out.println("Erreur Recepteur\n"+ e);
 	}

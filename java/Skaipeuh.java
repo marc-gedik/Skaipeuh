@@ -7,9 +7,10 @@ public class Skaipeuh{
 
     public static void main(String[] args){
 	try {
+
 	    int PORT1=0;
-	    int PORT2=0;
-	    String user, machine, port, IAM;
+	    String user="";
+		String machine, port, IAM;
 	    Recepteur recepteur;
 	    Emetteur emetteur;
 	    InetAddress localeAdresse;
@@ -17,8 +18,9 @@ public class Skaipeuh{
 	    ServeurTCP serveur;
 	    Thread t1, t2, t3;
 	   
-	    if(args.length==1){
-		PORT1=Integer.parseInt(args[0]);	   
+	    if(args.length==2){
+		PORT1=Integer.parseInt(args[0]);
+		user=args[1];	   
 	    }
 	    else{
 		System.out.println("manque les ports ");
@@ -27,7 +29,7 @@ public class Skaipeuh{
 	
 	    localeAdresse = InetAddress.getLocalHost();
 	    machine = localeAdresse.getHostAddress();
-	    user = Bourrage.bourrageUser("safir");
+	    user = Bourrage.bourrageUser(user);
 	    machine = Bourrage.bourrageMachine(machine);
 	    port = Bourrage.bourragePort(PORT1+"");
 
@@ -45,32 +47,45 @@ public class Skaipeuh{
 	    t2 = new Thread(serveur);
 	    t2.start();       
 
-	    String cmd;
+	    String cmd,tmp;
 	    boolean flag= true;
 	    BufferedInputStream text = new BufferedInputStream(System.in);
 	    Scanner sc = new Scanner(System.in);
 	    while(true){
+
 		if(text.available()>0){
 		    cmd = sc.nextLine();
-		    if(cmd.startsWith("BYE")){
+		    if(cmd.equals("BYE")){
 			emetteur = new Emetteur("BYE", user);
 			emetteur.lance();
 			System.exit(0);
 		    }
 		
-		    if(ServeurTCP.accept && flag){
+
+		    if(cmd.equals("RFH")){
+			emetteur = new Emetteur("RFH");
+			emetteur.lance();
+		    }
+		    
+		    
+		    if(cmd.startsWith("BAN")){
+			tmp = cmd.substring(4);
+			tmp = Bourrage.bourrageUser(tmp);
+			emetteur = new Emetteur("BAN " + tmp);
+			emetteur.lance();
+		    }
+		    if(cmd.equals("WHO")){
+			recepteur.tab.afficheUserConnect();
+		    }
+
+		  
+		}
+		if(ServeurTCP.accept && flag){
 			client = new ClientTCP(Integer.parseInt(port)); 
 			t3 = new Thread(client);
 			t3.start();
 			flag=false;
 		    }
-
-
-		    if(cmd.startsWith("WHO")){
-			recepteur.afficheClientConnect();
-		    }
-
-		}
 	    }
 	}
 	    catch (Exception e) {
