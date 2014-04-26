@@ -52,7 +52,7 @@ int main(int argc, char ** args){
   struct pollfd polls[3];
   struct personnes p;
   struct personne *personne;
-  int ready, n, firstHLO;
+  int ready, n, acceptIAM;
   unsigned int csize;
   pthread_t tclient;
   char msg[35];
@@ -83,12 +83,15 @@ int main(int argc, char ** args){
   strcpy(iam_msg + 13, ip);
   iam_msg[28] = ' ';
   int_bourrage(atoi(args[2]), 5, iam_msg + 29);
+  iam_msg[34] = '\0';
 
   sendto(sock_emet, iam_msg, 34, 0, (struct sockaddr *)&addr, sizeof(addr));
 
   iam_msg[0] = 'I';
   iam_msg[1] = 'A';
   iam_msg[2] = 'M';
+
+  printf("%s\n", iam_msg);
 
   polls[0].fd = 0;
   polls[0].events = POLLIN;
@@ -99,24 +102,47 @@ int main(int argc, char ** args){
   polls[2].fd = sock_recep;
   polls[2].events = POLLIN;
   
-  firstHLO = 0;
-  
+  acceptIAM = 1;
+  msg[34] = '\0';
+
   while(1){
     ready = poll(polls, 3, -1);
 
     while(ready --){
       if(polls[0].revents == POLLIN){
 	scanf("%d", &n);
+
+	if(n == -1){
+	  iam_msg[0] = 'B';
+	  iam_msg[1] = 'Y';
+	  iam_msg[2] = 'E';
+	  
+	  sendto(sock_emet, iam_msg, 34, 0, (struct sockaddr *)&addr, sizeof(addr));
+	  exit(EXIT_SUCCESS);
+	}
+
 	personne = get(&p, n);
-	if(personne == NULL)
+
+	if(personne == NULL){
+	  printf("\033c");
+	  print(&p);
+	  
+	  printf("\nIl n'y a pas de personne %d\n", n);
 	  break;
-	
-	sock_client = createSocket(personne->port, personne->adr); 
-	printf("%d %s\n", personne->port, personne->adr);
+	}
+	sock_client = createSocket(personne->port, personne->adr);
+	if(sock_client == -1){
+	  printf("\033c");
+	  print(&p);
+	  
+	  printf("Impossible de se connecter a %d\n", n);
+	  break;
+	}
+	printf("Connection etablie avec %s \n", personne->nom);
 	client(sock_client);
 	printf("retour de chat\n");
 	//retour de chat
-	sendto(sock_emet, "RFH", 3, 0, (struct sockaddr *)&addr, sizeof(addr));
+	sendto(sock_emet, "RFH\0", 4, 0, (struct sockaddr *)&addr, sizeof(addr));
 	
       }
       if(polls[1].revents == POLLIN){
@@ -128,30 +154,38 @@ int main(int argc, char ** args){
 	sock_b = accept(sock_serv, (struct sockaddr *)(&c), &csize);
 	printf("Accepter\n");
 	serveur(sock_a, sock_b);
+	printf("retour de chat\n");
 
-	//retour de chat
-	sendto(sock_emet, "RFH", 3, 0, (struct sockaddr *)&addr, sizeof(addr));
+
       }
       if(polls[2].revents == POLLIN){
-	recv(sock_recep,  msg, 256, 0);
+	recv(sock_recep,  msg, 34, 0);
 
-	if(IS_HLO(msg) || IS_RFH(msg)){
-	  if(firstHLO){
-	    printf("\033c");
-	    split_and_add(&p,msg);
-	    print(&p);
-	    sendto(sock_emet, iam_msg, 34, 0, (struct sockaddr *)&addr, sizeof(addr));
-	    firstHLO = 1;
-	  }
-	  if(firstHLO < 2)
-	    firstHLO ++;
+	if(strcmp(msg+3, iam_msg+3) == 0)
+	  break;
+
+	if(IS_HLO(msg)){
+	  acceptIAM = 0;
+	  split_and_add(&p,msg);
+	  printf("\033c");
+	  print(&p);
+	  sendto(sock_emet, iam_msg, 34, 0, (struct sockaddr *)&addr, sizeof(addr));
 	}
-	else if(IS_IAM(msg)){
-	  if(firstHLO < 2){
-	    printf("\033c");
-	    split_and_add(&p,msg);
-	    print(&p);
-	  }
+	else if(IS_IAM(msg) && acceptIAM){
+	  split_and_add(&p,msg);
+	  printf("\033c");
+	  print(&p);
+	}
+	else if(IS_RFH(msg)){
+	  acceptIAM = 1;
+	  del_all(&p);
+	  sendto(sock_emet, iam_msg, 34, 0, (struct sockaddr *)&addr, sizeof(addr));
+	}
+	else if(IS_BYE(msg)){
+	  split_and_del(&p, msg);
+	  printf("\033c");
+	  print(&p);
+
 	}
       }
     }
