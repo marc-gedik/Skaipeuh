@@ -96,6 +96,7 @@ void split_and_del(struct personnes * t, char * s){
 
 void print(struct personnes * t){
   int i;
+   printf("\033c");
   if(t->nbr == 0)
     printf("Il n'y a personne de connecter\n");
   else{
