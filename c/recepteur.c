@@ -24,6 +24,11 @@
 
 #define MAX_LINE 256
 
+#define ADRESSE "224.5.6.7"
+#define PORT 9876
+
+/* #define ADRESSE "225.1.2.4" */
+
 int createRecepteur(int port, char* adresse){
   int sock;
   int ok = 1;
@@ -31,8 +36,15 @@ int createRecepteur(int port, char* adresse){
   struct ip_mreq mreq;
 
   sock = socket(AF_INET, SOCK_DGRAM, 0);
-  
-  setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &ok, sizeof(ok));
+  if(sock == -1){
+    perror("Recepteur socket");
+    exit(EXIT_FAILURE);
+  }
+
+  if(setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &ok, sizeof(ok)) == -1){
+    perror("Recepteur setsockopt 1");
+    exit(EXIT_FAILURE);
+  }
   
   bzero(&addr, sizeof(addr));
   
@@ -40,12 +52,18 @@ int createRecepteur(int port, char* adresse){
   addr.sin_addr.s_addr = INADDR_ANY;
   addr.sin_port = htons(port);
   
-  bind(sock, (struct sockaddr *)&addr, sizeof(addr));
+  if(bind(sock, (struct sockaddr *)&addr, sizeof(addr)) == -1){
+    perror("Recepteur bind");
+    exit(EXIT_FAILURE);
+  }
   
   mreq.imr_multiaddr.s_addr = inet_addr(adresse);
   mreq.imr_interface.s_addr = htonl(INADDR_ANY);
   
-  setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
+  if(setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) == -1){
+    perror("Recepteur setsockopt 2");
+    exit(EXIT_FAILURE);
+  }
 
   return sock;
 }
@@ -73,14 +91,17 @@ int main(int argc, char ** args){
   csize = sizeof(c);
 
   sock_emet = socket(AF_INET, SOCK_DGRAM, 0);
-  
+  if(sock_emet == -1){
+    perror("Emetteur socket");
+    exit(EXIT_FAILURE);
+  }
   bzero(&addr, sizeof(addr));
   
   addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = inet_addr("225.1.2.4");
-  addr.sin_port = htons(28888);
+  addr.sin_addr.s_addr = inet_addr(ADRESSE);
+  addr.sin_port = htons(PORT);
 
-  sock_recep = createRecepteur(28888, "225.1.2.4"); 
+  sock_recep = createRecepteur(PORT, ADRESSE); 
   
   sock_serv = createServerSocket(atoi(args[2]));
 
@@ -124,6 +145,7 @@ int main(int argc, char ** args){
 	lu = read(STDIN_FILENO, buff, MAX_LINE);
 	buff[lu - 1] = '\0';
 
+	printf("Entre : %s\n", buff);
 	if(strcmp(buff, "/q") == 0 || strcmp(buff, "/quit") == 0){
 	  iam_msg[0] = 'B';
 	  iam_msg[1] = 'Y';
@@ -145,15 +167,15 @@ int main(int argc, char ** args){
 	  personne = get(&p, n);
 
 	  if(personne == NULL){
-	    printf("\033c");
 	    print(&p);
 	  
 	    printf("\nIl n'y a pas de personne %d\n", n);
 	    break;
 	  }
+
 	  sock_client = createSocket(personne->port, personne->adr);
+
 	  if(sock_client == -1){
-	    printf("\033c");
 	    print(&p);
 	  
 	    printf("Impossible de se connecter a %d\n", n);
@@ -163,7 +185,7 @@ int main(int argc, char ** args){
 	  client(sock_client);
 	  printf("retour de chat\n");
 	  //retour de chat
-	  sendto(sock_emet, "RFH\0", 4, 0, (struct sockaddr *)&addr, sizeof(addr));
+	  sendto(sock_emet, "RFH", 3, 0, (struct sockaddr *)&addr, sizeof(addr));
 	}
       }
       if(polls[1].revents == POLLIN){
@@ -205,13 +227,11 @@ int main(int argc, char ** args){
 	else if(IS_HLO(msg)){
 	  acceptIAM = 0;
 	  split_and_add(&p,msg);
-	  printf("\033c");
 	  print(&p);
 	  sendto(sock_emet, iam_msg, 34, 0, (struct sockaddr *)&addr, sizeof(addr));
 	}
 	else if(IS_IAM(msg) && acceptIAM){
 	  split_and_add(&p,msg);
-	  printf("\033c");
 	  print(&p);
 	}
 	else if(IS_RFH(msg)){
@@ -221,7 +241,6 @@ int main(int argc, char ** args){
 	}
 	else if(IS_BYE(msg)){
 	  split_and_del(&p, msg);
-	  printf("\033c");
 	  print(&p);
 	}
       }

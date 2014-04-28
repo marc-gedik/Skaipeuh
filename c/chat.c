@@ -32,49 +32,51 @@ int createSocket(int port, char* adresse){
   int sock;
 
   sock = socket(PF_INET, SOCK_STREAM, 0);
-  if(sock == -1)
+  if(sock == -1){
+    perror("Erreur create client");
     return -1;
-  
+  }
   bzero(&addr, sizeof(addr));
-  
+
   addr.sin_family = AF_INET;
   addr.sin_port = htons(port);
   addr.sin_addr.s_addr = inet_addr(adresse);
+  printf("%d %s\n", port, adresse);
 
   if(connect(sock, (struct sockaddr *)&addr, sizeof(addr)) == -1){
+    perror("Client connect");
     close(sock);
     return -1;
   }
-  
+    printf("os\n");
+
   return sock;
 }
 
 int createServerSocket(int port){
   struct sockaddr_in addr;
   int sock;
-  
   sock = socket(PF_INET, SOCK_STREAM, 0);
   if(sock == -1){
     perror("Serveur socket");
     exit(EXIT_FAILURE);
   }
   bzero(&addr, sizeof(addr));
-  
+
   addr.sin_family = AF_INET;
   addr.sin_port = htons(port);
   addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  
+
   if(bind(sock, (struct sockaddr *)&addr, sizeof(addr)) == -1){
     perror("Serveur bind");
     exit(EXIT_FAILURE);
   }
-  
+
   if(listen(sock, 0) == -1){
     perror("Seveur listen");
     exit(EXIT_FAILURE);
   }
 
-  perror("serveur");
   return sock;
 }
 
@@ -144,6 +146,7 @@ void client(int sock){
     }
     if(polls[1].revents == POLLIN){
       read(sock, buff, 4);
+      printf("%s\n", buff);
       if(IS_MSG(buff)){
 	read(sock, buff, 4);
 	buff[4] = '\0';
