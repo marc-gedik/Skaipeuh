@@ -19,7 +19,7 @@ public class Recepteur implements Runnable{
 	    DatagramPacket dp = new DatagramPacket(rep.getBytes(), 
 						   rep.getBytes().length,
 						   ia,
-						   61234); 
+						  9876); 
 	    ds.send(dp); 
 	} 
 	catch(Exception e) { 
@@ -34,7 +34,7 @@ public class Recepteur implements Runnable{
 	    String tmp="";
 	    byte [] buff = new byte[256]; 
 	    InetAddress ia = InetAddress.getByName("224.5.6.7"); 
-	    MulticastSocket ms = new MulticastSocket(61234); 
+	    MulticastSocket ms = new MulticastSocket(9876); 
 	    ms.joinGroup(ia); 
 	    DatagramPacket dp = new DatagramPacket(buff, buff.length);
 	    boolean flag1= true;

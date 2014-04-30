@@ -40,7 +40,7 @@ public class Emetteur {
 		new DatagramPacket(msg.getBytes(), 
 				   msg.getBytes().length,
 				   ia,
-				   61234); 
+				   9876); 
 	    ds.send(dp); 
 	    //System.out.println(msg); 
 	} catch(Exception e) { 
