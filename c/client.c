@@ -3,29 +3,14 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <sys/socket.h>
 #include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netdb.h>
 
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
-#include <libgen.h>
 
 #include <poll.h>
 
 #include "tools.h"
-
-#define IS_MSG(s) firstThreeLetters(s, "MSG")
-#define IS_CLO(s) firstThreeLetters(s, "CLO")
-#define IS_FIL(s) firstThreeLetters(s, "FIL")
-#define IS_ACK(s) firstThreeLetters(s, "ACK")
-#define IS_NAK(s) firstThreeLetters(s, "NAK")
-
-#define MAX_LINE 500
-
 
 int createSocket(int port, char* adresse){
   struct sockaddr_in addr;
@@ -38,7 +23,6 @@ int createSocket(int port, char* adresse){
   }
   bzero(&addr, sizeof(addr));
 
-  printf("%d, %s\n", port, adresse);
   addr.sin_family = AF_INET;
   addr.sin_port = htons(port);
   addr.sin_addr.s_addr = inet_addr(adresse);
@@ -52,34 +36,8 @@ int createSocket(int port, char* adresse){
   return sock;
 }
 
-int createServerSocket(int port){
-  struct sockaddr_in addr;
-  int sock;
-  sock = socket(PF_INET, SOCK_STREAM, 0);
-  if(sock == -1){
-    perror("Serveur socket");
-    exit(EXIT_FAILURE);
-  }
-  bzero(&addr, sizeof(addr));
 
-  addr.sin_family = AF_INET;
-  addr.sin_port = htons(port);
-  addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-  if(bind(sock, (struct sockaddr *)&addr, sizeof(addr)) == -1){
-    perror("Serveur bind");
-    exit(EXIT_FAILURE);
-  }
-
-  if(listen(sock, 0) == -1){
-    perror("Seveur listen");
-    exit(EXIT_FAILURE);
-  }
-
-  return sock;
-}
-
-void client(int sock){
+void client(int sock, char * adresse){
   struct pollfd polls[2]; 
   int len, n, port, desc;
   struct stat statbuf; 
@@ -98,13 +56,17 @@ void client(int sock){
       n = read(STDIN_FILENO, buff + 8, MAX_LINE);
       buff[7+n] = '\0';
       len = strlen(buff);
-      if(strcmp(buff+8, "/q") ==0 || strcmp(buff+8, "/quit") == 0){
+      if(strcmp(buff+8, "\\h") == 0 || strcmp(buff+8, "\\help") == 0 || strcmp(buff+8, "\\?") == 0){
+	  printf("Envoie de fichier\t: \\f <nom_du_fichier> <numero_de_port>\n");
+	  printf("Quitter la conversation\t: \\q ou \\quit\n");
+      }
+      else if(strcmp(buff+8, "\\q") ==0 || strcmp(buff+8, "\\quit") == 0){
 	strcpy(buff, "CLO");
 	write(sock, buff, 3);
 	printf("Discussion termine\n");
 	break;
       }
-      else if(strncmp("/f ", buff+8, 3) == 0 || strncmp("/file ", buff+8, 6) == 0){
+      else if(strncmp("\\f ", buff+8, 3) == 0 || strncmp("\\file ", buff+8, 6) == 0){
 	if(buff[10] == ' ')
 	  n = 11;
 	else 
@@ -140,13 +102,11 @@ void client(int sock){
 	buff[0] = 'M', buff[1] = 'S', buff[2] = 'G', buff[3] = ' ';
 	int_bourrage(strlen(buff+8), 3, buff+4);
 	buff[7] = ' ';
-	printf("envoie:%s\n", buff);
 	write(sock, buff, strlen(buff) + 8);
       }
     }
     if(polls[1].revents == POLLIN){
       read(sock, buff, 4);
-      //printf("Recu:%s\n", buff);
       if(IS_MSG(buff)){
 	read(sock, buff, 4);
 	buff[4] = '\0';
@@ -165,7 +125,7 @@ void client(int sock){
 	
 	if(buff[0] == 'y'){
 	  write(sock, "ACK", 3);
-	  printf("lancement de l'echange ...\n");
+	  printf("lancement de l'echange ... %s\n", adresse);
 	  //lancer le serveur en thread
 	}
 	else
@@ -177,34 +137,7 @@ void client(int sock){
 }
 
 void * thread_client(void * s){
-  client(*((int *)s));
+  struct client_args * args = ( struct client_args *)s;
+  client(args->socket, args->addr);
   return NULL;
 }
-
-void serveur(int sock_a, int sock_b){
-  struct pollfd polls[2];
-  char buff[MAX_LINE + 4 + 4];
-  int lu;
-
-  polls[0].fd = sock_a;
-  polls[0].events = POLLIN;
-
-  polls[1].fd = sock_b;
-  polls[1].events = POLLIN;
-
-  while(1){
-    poll(polls, 2, -1);
-    if(polls[0].revents == POLLIN){
-      lu = read(sock_a, buff, MAX_LINE + 8);
-      write(sock_b, buff, lu);
-    }
-    if(polls[1].revents == POLLIN){
-      lu = read(sock_b, buff, MAX_LINE + 8);
-      write(sock_a, buff, lu);
-    }    
-    if(IS_CLO(buff)){
-      break;
-    }
-  }
-}
-

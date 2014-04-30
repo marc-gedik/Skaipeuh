@@ -1,3 +1,9 @@
+/* TAB.H */
+
+#ifndef TAB_H
+
+#define TAB_H
+
 struct personne{
   char nom[9];
   int port;
@@ -18,3 +24,5 @@ void del(struct personnes * t, int pos);
 void del_all(struct personnes * t);
 struct personne * get(struct personnes * t, int pos);
 void split_and_del(struct personnes * t, char * s);
+
+#endif

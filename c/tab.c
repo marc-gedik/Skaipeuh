@@ -97,18 +97,19 @@ void split_and_del(struct personnes * t, char * s){
 
 void print(struct personnes * t){
   int i;
-   printf("\033c");
+  printf("\033c");
   if(t->nbr == 0)
     printf("Il n'y a personne de connecter\n");
   else{
     printf("      - Liste des personnes - \n\n");
-    printf("   nom      | port  | adresse\n");
-    printf("------------+-------+----------------\n");
+    printf("        nom     | port  | adresse\n");
+    printf("----------------+-------+----------------\n");
+  
+    for(i=0; i < t->nbr; i++){
+      printf("%d.\t%s| %d\t| %s\n", i, t->tab[i].nom, t->tab[i].port, t->tab[i].adr);
+    }
+    printf("----------------+-------+----------------\n");
   }
-  for(i=0; i < t->nbr; i++){
-    printf("%d. %s | %d | %s\n", i, t->tab[i].nom, t->tab[i].port, t->tab[i].adr);
-  }
-  printf("-------------------------------------\n");
 
-  printf("/q ou /quit pour se deconecter\n");
+  printf("\\q pour se deconecter, \\r pour rafraichir\n");
 }

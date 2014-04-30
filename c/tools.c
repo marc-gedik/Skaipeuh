@@ -1,10 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdio.h>
 #include <unistd.h>
 #include <netdb.h>
 
@@ -39,7 +34,7 @@ void debourrage_ip(char * s){
   s3 = s+8, s3[3] = '\0';
   s4 = s+12, s4[3] = '\0';
 
-  sprintf(s, "%d.%d.%d.%d\n", atoi(s1), atoi(s2), atoi(s3), atoi(s4));
+  sprintf(s, "%d.%d.%d.%d", atoi(s1), atoi(s2), atoi(s3), atoi(s4));
 }
 
 int firstThreeLetters(char * s1, char * s2){

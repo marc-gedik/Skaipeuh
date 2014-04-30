@@ -1,4 +1,4 @@
-SOURCES = recepteur.c chat.c tools.c tab.c
+SOURCES = skaipeuh.c recepteur.c tools.c tab.c client.c serveur.c
 OBJS = $(SOURCES:%.c=%.o)
 INCLUDES = -lpthread
 
@@ -13,8 +13,9 @@ skaipeuh: $(OBJS)
 %.o: %.c
 	gcc $< $(OPTION) -c
 
-recepteur.o: chat.h tools.h
-chat.c: tools.h
+skaipeuh.o: recepteur.h tools.h tab.h client.h serveur.h
+client.o: tools.h
+serveur.o: tools.h
 
 clean: 
 	rm -f skaipeuh $(OBJS)
