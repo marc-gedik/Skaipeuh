@@ -27,7 +27,6 @@
 #define ADRESSE "224.5.6.7"
 #define PORT 9876
 
-/* #define ADRESSE "225.1.2.4" */
 
 int createRecepteur(int port, char* adresse){
   int sock;
@@ -159,6 +158,9 @@ int main(int argc, char ** args){
 
 	  sendto(sock_emet, msg, 12, 0, (struct sockaddr *)&addr, sizeof(addr));
 	}
+	else if(strcmp(buff, "refresh") == 0){
+	  sendto(sock_emet, "RFH", 3, 0, (struct sockaddr *)&addr, sizeof(addr));
+	}
 	else{
 	  n = atoi(buff);
 	  personne = get(&p, n);
@@ -173,7 +175,7 @@ int main(int argc, char ** args){
 	  sock_client = createSocket(personne->port, personne->adr);
 	  if(sock_client == -1){
 	    print(&p);
-	  
+	    perror("Impossible de se connecter a");
 	    printf("Impossible de se connecter a %d\n", n);
 	    break;
 	  }
@@ -189,6 +191,8 @@ int main(int argc, char ** args){
       // Accepte du serveur
       if(polls[1].revents == POLLIN){
 	sock_a = accept(sock_serv, (struct sockaddr *)(&c), &csize);
+	printf("%s\n", inet_ntoa(c.sin_addr));
+
 	sock_client = createSocket(atoi(args[2]), "127.0.0.1");
 	pthread_create(&tclient, NULL, thread_client, (void *)(&sock_client));
 

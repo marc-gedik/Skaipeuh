@@ -41,7 +41,6 @@ int createSocket(int port, char* adresse){
   addr.sin_family = AF_INET;
   addr.sin_port = htons(port);
   addr.sin_addr.s_addr = inet_addr(adresse);
-  printf("%d %s\n", port, adresse);
 
   if(connect(sock, (struct sockaddr *)&addr, sizeof(addr)) == -1){
     perror("Client connect");
@@ -140,12 +139,13 @@ void client(int sock){
 	buff[0] = 'M', buff[1] = 'S', buff[2] = 'G', buff[3] = ' ';
 	int_bourrage(strlen(buff+8), 3, buff+4);
 	buff[7] = ' ';
-	write(sock, buff, MAX_LINE + 8);
+	printf("envoie:%s\n", buff);
+	write(sock, buff, strlen(buff) + 8);
       }
     }
     if(polls[1].revents == POLLIN){
       read(sock, buff, 4);
-      printf("%s\n", buff);
+      //printf("Recu:%s\n", buff);
       if(IS_MSG(buff)){
 	read(sock, buff, 4);
 	buff[4] = '\0';
@@ -183,6 +183,7 @@ void * thread_client(void * s){
 void serveur(int sock_a, int sock_b){
   struct pollfd polls[2];
   char buff[MAX_LINE + 4 + 4];
+  int lu;
 
   polls[0].fd = sock_a;
   polls[0].events = POLLIN;
@@ -193,12 +194,12 @@ void serveur(int sock_a, int sock_b){
   while(1){
     poll(polls, 2, -1);
     if(polls[0].revents == POLLIN){
-      read(sock_a, buff, MAX_LINE + 8);
-      write(sock_b, buff, MAX_LINE + 8);
+      lu = read(sock_a, buff, MAX_LINE + 8);
+      write(sock_b, buff, lu);
     }
     if(polls[1].revents == POLLIN){
-      read(sock_b, buff, MAX_LINE + 8);
-      write(sock_a, buff, MAX_LINE + 8);
+      lu = read(sock_b, buff, MAX_LINE + 8);
+      write(sock_a, buff, lu);
     }    
     if(IS_CLO(buff)){
       break;
