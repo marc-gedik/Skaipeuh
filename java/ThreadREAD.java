@@ -13,11 +13,23 @@ public class ThreadREAD implements Runnable{
 
  
     public void run(){
-	try{	
-	    BufferedReader bf = new BufferedReader (new InputStreamReader(s.getInputStream()));
+	try{
+	    InputStream bf = null;
+	
+	    bf = s.getInputStream();
+
+	    byte[] b = new byte[508];
 	    while(true){
+		
+		bf.read(b, 0, 4);
+		if(b[0] == 'M' && b[1] == 'S' && b[2] == 'G'){
+		    bf.read(b, 0, 4);
+		    for(int i =0; i < 3; i++)
+			System.out.print(":" + b[0] + " ");
+		}
+		
 		//System.out.println("j'écoute");		
-		System.out.println(bf.readLine());
+		System.out.println("");
 	    }
 	}
 	catch (IOException e) {
