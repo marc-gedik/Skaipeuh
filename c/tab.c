@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "tab.h"
+#include "tools.h"
 
 void increase_size(struct personnes * t){
   printf("Double\n");
@@ -44,7 +45,7 @@ struct personne split(char * s){
 
   strncpy(p.nom, s + 4, 8);
   p.nom[8] = '\0';
-  strncpy(p.adr, s + 13, 15);
+  debourrage_ip(strncpy(p.adr, s + 13, 15));
 
   p.port = atoi(s + 29);
   
@@ -102,7 +103,7 @@ void print(struct personnes * t){
   else{
     printf("      - Liste des personnes - \n\n");
     printf("   nom      | port  | adresse\n");
-    printf("-------------------------------------\n");
+    printf("------------+-------+----------------\n");
   }
   for(i=0; i < t->nbr; i++){
     printf("%d. %s | %d | %s\n", i, t->tab[i].nom, t->tab[i].port, t->tab[i].adr);

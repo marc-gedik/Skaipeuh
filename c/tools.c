@@ -31,6 +31,17 @@ void string_bourrage(char* str, int size, char* s){
   }
 }
 
+void debourrage_ip(char * s){
+  char *s1, *s2, *s3, *s4;
+  
+  s1 = s, s1[3] = '\0';
+  s2 = s+4, s2[3] = '\0';
+  s3 = s+8, s3[3] = '\0';
+  s4 = s+12, s4[3] = '\0';
+
+  sprintf(s, "%d.%d.%d.%d\n", atoi(s1), atoi(s2), atoi(s3), atoi(s4));
+}
+
 int firstThreeLetters(char * s1, char * s2){
   return s1[0] == s2[0] && s1[1] == s2[1] && s1[2] == s2[2];
 }

@@ -38,6 +38,7 @@ int createSocket(int port, char* adresse){
   }
   bzero(&addr, sizeof(addr));
 
+  printf("%d, %s\n", port, adresse);
   addr.sin_family = AF_INET;
   addr.sin_port = htons(port);
   addr.sin_addr.s_addr = inet_addr(adresse);
