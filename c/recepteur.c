@@ -123,8 +123,6 @@ int main(int argc, char ** args){
   iam_msg[1] = 'A';
   iam_msg[2] = 'M';
 
-  printf("%s\n", iam_msg);
-
   polls[0].fd = 0;
   polls[0].events = POLLIN;
 
@@ -145,7 +143,6 @@ int main(int argc, char ** args){
 	lu = read(STDIN_FILENO, buff, MAX_LINE);
 	buff[lu - 1] = '\0';
 
-	printf("Entre : %s\n", buff);
 	if(strcmp(buff, "/q") == 0 || strcmp(buff, "/quit") == 0){
 	  iam_msg[0] = 'B';
 	  iam_msg[1] = 'Y';
@@ -174,13 +171,13 @@ int main(int argc, char ** args){
 	  }
 
 	  sock_client = createSocket(personne->port, personne->adr);
-
 	  if(sock_client == -1){
 	    print(&p);
 	  
 	    printf("Impossible de se connecter a %d\n", n);
 	    break;
 	  }
+
 	  printf("Connection etablie avec %s \n", personne->nom);
 	  client(sock_client);
 	  printf("retour de chat\n");
@@ -188,6 +185,8 @@ int main(int argc, char ** args){
 	  sendto(sock_emet, "RFH", 3, 0, (struct sockaddr *)&addr, sizeof(addr));
 	}
       }
+      
+      // Accepte du serveur
       if(polls[1].revents == POLLIN){
 	sock_a = accept(sock_serv, (struct sockaddr *)(&c), &csize);
 	sock_client = createSocket(atoi(args[2]), "127.0.0.1");
@@ -196,10 +195,9 @@ int main(int argc, char ** args){
 	sock_b = accept(sock_serv, (struct sockaddr *)(&c), &csize);
 	printf("Quelqu'un souhaite vous parler : \n");
 	serveur(sock_a, sock_b);
-	
-
-
       }
+
+      // Read dans le recepteur
       if(polls[2].revents == POLLIN){
 	recvfrom(sock_recep,  msg, 34, 0, (struct sockaddr *)(&from), &lg);
 

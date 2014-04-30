@@ -48,7 +48,6 @@ int createSocket(int port, char* adresse){
     close(sock);
     return -1;
   }
-    printf("os\n");
 
   return sock;
 }

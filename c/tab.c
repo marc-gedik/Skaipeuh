@@ -109,5 +109,5 @@ void print(struct personnes * t){
   }
   printf("-------------------------------------\n");
 
-  printf("-1. pour se deconecter\n");
+  printf("/q ou /quit pour se deconecter\n");
 }
