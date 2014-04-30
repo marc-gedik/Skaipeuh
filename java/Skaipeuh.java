@@ -10,11 +10,11 @@ public class Skaipeuh{
 
 	    int PORT1=0;
 	    String user="";
-		String machine, port, IAM;
+	    String machine, port, IAM;
 	    Recepteur recepteur;
 	    Emetteur emetteur;
 	    InetAddress localeAdresse;
-	    ClientTCP client;
+	   
 	    ServeurTCP serveur;
 	    Thread t1, t2, t3;
 	   
@@ -53,7 +53,7 @@ public class Skaipeuh{
 	    Scanner sc = new Scanner(System.in);
 	    while(true){
 
-		if(text.available()>0){
+	
 		    cmd = sc.nextLine();
 		    if(cmd.equals("BYE")){
 			emetteur = new Emetteur("BYE", user);
@@ -79,13 +79,13 @@ public class Skaipeuh{
 		    }
 
 		  
-		}
-		if(ServeurTCP.accept && flag){
+	
+		/*	if(ServeurTCP.accept && flag){
 			client = new ClientTCP(Integer.parseInt(port)); 
 			t3 = new Thread(client);
 			t3.start();
 			flag=false;
-		    }
+			}*/
 	    }
 	}
 	    catch (Exception e) {

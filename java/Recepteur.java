@@ -45,7 +45,7 @@ public class Recepteur implements Runnable{
 		ms.receive(dp); 
 		msg = new String(dp.getData(), 0, dp.getLength());
 
-		if(!(msg.substring(4).equals(msgIAM.substring(4)))){
+		if(!(msg.substring(3).equals(msgIAM.substring(3)))){
 						
 		    if(msg.startsWith("HLO")){
 			flag1=false;
@@ -59,6 +59,7 @@ public class Recepteur implements Runnable{
 
 		
 		    if(msg.startsWith("IAM") && flag1){	    
+			System.out.println(msg);
 			tab.addUser(msg);
 		    }
 		  
@@ -67,10 +68,10 @@ public class Recepteur implements Runnable{
 	
 		    if(msg.startsWith("RFH")){	    
 			tab.clearTabUser();
+			System.out.println("coucou");
 			flag1=true;
 			reponseRecepteur(msgIAM);  
 		    }
-
 
 
 
