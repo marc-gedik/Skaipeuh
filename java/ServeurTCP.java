@@ -34,7 +34,7 @@ class ServeurTCP implements Runnable{
 	    Thread t2 = new Thread(wri);
 
 	    t1.start();
-	    t2.start();
+	    t2.run();
 	} 
 	catch (IOException e) {
 	    System.out.println("Erreur ServeurTCP\n" + e);

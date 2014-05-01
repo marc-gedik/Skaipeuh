@@ -18,18 +18,18 @@ public class ServeurThread implements Runnable{
     
     public void run(){
 	try{
-
+	    char[] buff = new char[508];
 	    BufferedReader br;
 	    PrintWriter pw;
-	    String msg;
+	    int len;
 	    br = new BufferedReader(new InputStreamReader(s1.getInputStream()));
 	    pw = new PrintWriter(new OutputStreamWriter(s2.getOutputStream()));
 	    
 	    while(true){
 		System.out.println("Serveur en attente ...");
-		msg = br.readLine();
-		//	System.out.println(msg);	        
-		pw.println(msg);
+		len = br.read(buff, 0, buff.length);
+
+		pw.write(buff, 0, len);
 		pw.flush();
 	    }
 	}
