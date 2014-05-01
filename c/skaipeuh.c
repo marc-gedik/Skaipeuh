@@ -53,6 +53,8 @@ int main(int argc, char ** args){
   sock_recep = createRecepteur(PORT, ADRESSE); 
   
   sock_serv = createServerSocket(atoi(args[2]));
+  if(sock_serv == -1)
+    exit(EXIT_FAILURE);
 
   string_bourrage(args[1], 8, me);
   me[8] = '\0';

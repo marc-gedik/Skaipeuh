@@ -9,8 +9,12 @@
 #include <fcntl.h>
 
 #include <poll.h>
+#include <pthread.h>
+#include <libgen.h>
 
 #include "tools.h"
+#include "serveur.h"
+#include "client.h"
 
 int createSocket(int port, char* adresse){
   struct sockaddr_in addr;
@@ -36,13 +40,38 @@ int createSocket(int port, char* adresse){
   return sock;
 }
 
+void * thread_client(void * s){
+  struct client_args * args = ( struct client_args *)s;
+  client(args->socket, args->addr);
+  return NULL;
+}
+
+void * send_file(void * s){
+  struct send_file * args = (struct send_file * )s;
+  int lu;
+  char buff[BUFFSIZE + 1];
+
+  while((lu = read(args->file, buff, BUFFSIZE)) > 0){
+    write(args->socket, buff, lu);
+  }
+
+  printf("Echange fini\n");
+  close(args->socket);
+  close(args->file);
+  return NULL;
+}
 
 void client(int sock, char * adresse){
   struct pollfd polls[2]; 
-  int len, n, port, desc;
+  int i;
+  int len, n, port;
   struct stat statbuf; 
-  int filesize;
+  int filesize, fileport;
+  struct serveur_args args;
+  struct send_file sendargs;
+  pthread_t tfile;
   char buff[MAX_LINE + 4 + 4];
+  char filename[41];
 
   polls[0].fd = 0;
   polls[0].events = POLLIN;
@@ -71,8 +100,8 @@ void client(int sock, char * adresse){
 	  n = 11;
 	else 
 	  n = 15;
-	desc = open(buff+n, O_RDONLY);
-	if(desc == -1){
+	sendargs.file = open(buff+n, O_RDONLY);
+	if(sendargs.file == -1){
 	  perror("Impossible d'ouvrir le fichier");
 	}
 	else{
@@ -81,18 +110,23 @@ void client(int sock, char * adresse){
 	  buff[0] = 'F', buff[1] = 'I', buff[2] = 'L';
 	  printf("Sur quel port envoyer ?\n");
 	  scanf("%d", &port);
-	  sprintf(buff + 3, " %d %s ", filesize, buff+n);
+	  sprintf(buff + 3, " %d ", filesize);
 	  len = strlen(buff);
-	  int_bourrage(port, 5, buff+len);
-	  buff[len+5] = '\0';
-	  write(sock, buff, len + 5);
+	  
+	  string_bourrage(basename(buff+n), 40, buff + len) ;
+	  buff[len+40] = ' ';
+	  int_bourrage(port, 5, buff+len+41);
+	  buff[len+41+5] = '\0';
+
+	  write(sock, buff, len + 41+ 5);
 
 	  //attente de la reponse
 	  read(sock, buff, 3);
 	  buff[4] = '\0';
 	  if(IS_ACK(buff)){
 	    printf("L'echange a ete accepter\n");
-	    //lance la socket sur le port 'port'
+	    sendargs.socket = createSocket(port, adresse);
+	    pthread_create(&tfile, NULL, send_file, (void *)(&sendargs));
 	  }
 	  else
 	    printf("L'echange a ete refusé\n");
@@ -120,13 +154,32 @@ void client(int sock, char * adresse){
 	break;
       }
       else if(IS_FIL(buff)){
-	printf("Acceptez le fichier ?(y/n)\n");
-	n = read(STDIN_FILENO, buff, MAX_LINE);
+	i = 0;
+	do{
+	  read(sock, buff + i, 1);
+	}while(buff[i++] != ' ');
+	filesize = atoi(buff);
+	read(sock, filename , 40);
+	filename[40] = '\0';
+	sprintf(filename, "%s", basename(filename));
+	for(i = 40 -1; i > 0 && filename[i] == ' '; i --)
+	  filename[i] = '\0';
+
+	read(sock, buff, 1);
+	read(sock, buff, 5);
+	buff[5] = '\0';
+	fileport = atoi(buff);
+
+	printf("Acceptez le fichier %s (%d octets) ?(y/n)\n", filename, filesize);
 	
+	read(STDIN_FILENO, buff, MAX_LINE);
+
 	if(buff[0] == 'y'){
+	  args.port = fileport;
+	  args.filesize = filesize;
+	  args.filename = filename;
+	  pthread_create(&tfile, NULL, thread_serveur, (void *)(&args));
 	  write(sock, "ACK", 3);
-	  printf("lancement de l'echange ... %s\n", adresse);
-	  //lancer le serveur en thread
 	}
 	else
 	  write(sock, "NAK", 3);
@@ -136,8 +189,3 @@ void client(int sock, char * adresse){
   close(sock);
 }
 
-void * thread_client(void * s){
-  struct client_args * args = ( struct client_args *)s;
-  client(args->socket, args->addr);
-  return NULL;
-}

@@ -2,11 +2,6 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
-struct client_args{
-  int socket;
-  char * addr;
-};
-
 void int_bourrage(int n, int size, char * s);
 
 void string_bourrage(char* str, int size, char* s);
@@ -30,6 +25,7 @@ char * getip();
 #define IS_NAK(s) firstThreeLetters(s, "NAK")
 
 #define MAX_LINE 500
+#define BUFFSIZE 512
 
 #define ADRESSE "224.5.6.7"
 #define PORT 9876
