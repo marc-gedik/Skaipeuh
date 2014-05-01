@@ -18,7 +18,7 @@ public class TabUser{
 	    System.out.print("\033c");
 	
 	if(nbEle == 0){
-	    System.out.println("Il n'y a personne de connecter");
+	    System.out.println("Personne n'est connectee");
 	}
 	else{
 	    System.out.println("      - Liste des personnes - \n");
