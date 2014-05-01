@@ -165,6 +165,7 @@ int main(int argc, char ** args){
 	if(IS_BAN(msg)){
 	  msg[12] = '\0';
 	  if(strcmp(msg + 4, me) == 0){
+	    printf("%d\n", ban[0]);
 	    if(ban[0] == 0){ 
 	      strcpy(ban,inet_ntoa(from.sin_addr));
 	      printf("Une personne veut vous bannir\n");
