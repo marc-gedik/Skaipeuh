@@ -19,7 +19,7 @@
 int main(int argc, char ** args){
   int sock_recep, sock_emet, sock_serv, sock_a, sock_b, sock_client;
   struct sockaddr_in addr, c, from;
-  char * ban = NULL;
+  char ban[16];
   struct pollfd polls[3];
   struct personnes p;
   struct personne *personne;
@@ -37,6 +37,8 @@ int main(int argc, char ** args){
   p = create();
   ip = getip();
   
+  ban[0] = 0;
+
   csize = sizeof(c);
 
   sock_emet = socket(AF_INET, SOCK_DGRAM, 0);
@@ -163,7 +165,8 @@ int main(int argc, char ** args){
 	if(IS_BAN(msg)){
 	  msg[12] = '\0';
 	  if(strcmp(msg + 4, me) == 0){
-	    if(ban == NULL){ 
+	    printf("%d\n", ban[0]);
+	    if(ban[0] == 0){ 
 	      strcpy(ban,inet_ntoa(from.sin_addr));
 	      printf("Une personne veut vous bannir\n");
 	      printf("%s\n", ban);
