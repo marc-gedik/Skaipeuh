@@ -2,89 +2,75 @@ import java.net.*;
 
 public class Recepteur implements Runnable{
     TabUser tab = new TabUser();
-    String msgIAM;
-    String user;
-
-    public Recepteur(String msg){
-	this.msgIAM = msg;
-	this.user=msgIAM.substring(4, 12);
+    String IAM, BYE, BAN;
+    String IPgroup;
+    int PORTgroup;
+    
+    public Recepteur(String IAM, String BYE, String BAN, String IPgroup, int PORTgroup){
+	this.IAM = IAM;
+	this.BYE = BYE;
+	this.BAN = BAN;
+	this.IPgroup = IPgroup;
+	this.PORTgroup = PORTgroup;
     }
 
-
-    public static void reponseRecepteur(String rep){
-	try{
-
-	    DatagramSocket ds = new DatagramSocket(); 
-	    InetAddress ia = InetAddress.getByName("224.5.6.7"); 
-	    DatagramPacket dp = new DatagramPacket(rep.getBytes(), 
-						   rep.getBytes().length,
-						   ia,
-						  9876); 
-	    ds.send(dp); 
-	} 
-	catch(Exception e) { 
-	    System.out.println("Erreur reponseRecepteur\n" +e );
-	}
-    }
 
 
     public void run() { 
 	try { 
-	    String msg;
-	    String tmp="";
 	    byte [] buff = new byte[256]; 
-	    InetAddress ia = InetAddress.getByName("224.5.6.7"); 
-	    MulticastSocket ms = new MulticastSocket(9876); 
+	    InetAddress ia = InetAddress.getByName(IPgroup); 
+	    MulticastSocket ms = new MulticastSocket(PORTgroup); 
 	    ms.joinGroup(ia); 
 	    DatagramPacket dp = new DatagramPacket(buff, buff.length);
-	    boolean flag1= true;
-	    InetAddress bannisseur1 =null;
-	    InetAddress bannisseur2 =null;
+	    
+	    String msg;
+	    boolean flag = true;
+	    InetAddress bannisseur1 = null;
+	    InetAddress bannisseur2 = null;
+	    Emetteur emetteur = new Emetteur(IPgroup, PORTgroup);
+
 
 	    while (true) { 
 		ms.receive(dp); 
 		msg = new String(dp.getData(), 0, dp.getLength());
 
-		if(!(msg.substring(3).equals(msgIAM.substring(3)))){
+		if(!(msg.substring(3).equals(IAM.substring(3)))){
 						
 		    if(msg.startsWith("HLO")){
-			flag1=false;
-
-			System.out.println("HLO reçu j'envoie: " + msgIAM); 
+			flag=false;
+			System.out.println("HLO reçu j'envoie: " + IAM); 
 			tab.addUser(msg);
-			reponseRecepteur(msgIAM);
+			emetteur.lance(IAM);
+			tab.afficheEvent(msg.substring(4, 12)+" s'est connecte(e)");
+
 		    }			
 
-
-
 		
-		    if(msg.startsWith("IAM") && flag1){	    
-			System.out.println(msg);
-			tab.addUser(msg);
+	           if(msg.startsWith("IAM") && flag){
+		       tab.addUser(msg);
+		       tab.afficheUserConnect(true); 
+
 		    }
-		  
+		
 
-
-	
 		    if(msg.startsWith("RFH")){	    
 			tab.clearTabUser();
-			System.out.println("coucou");
-			flag1=true;
-			reponseRecepteur(msgIAM);  
+			flag=true;
+			emetteur.lance(IAM);
 		    }
 
 
-
-
-		    if(msg.startsWith("BYE")){
+		    if(msg.startsWith("BYE") && !(msg.equals(BYE))){
 			System.out.println("Message recu:  "+ msg); 
 			tab.removeUser(msg.substring(4, 12));
+			tab.afficheEvent(msg.substring(4, 12)+" s'est déconnecte(e)");
+
 		    }
 		   
 
-
-
-		    if(msg.equals("BAN "+ user)){
+		    
+		    if(msg.equals(BAN)){
 			System.out.println("Message recu:  "+ msg); 
 			if(bannisseur1==null){
 			    bannisseur1=dp.getAddress();
@@ -92,7 +78,7 @@ public class Recepteur implements Runnable{
 			else{
 			    bannisseur2=dp.getAddress();
 			    if((bannisseur2.equals(bannisseur1))){
-				reponseRecepteur("BYE "+user);
+				emetteur.lance(BYE);
 				System.exit(0);
 			    }
 			}
