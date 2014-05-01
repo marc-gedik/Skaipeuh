@@ -85,9 +85,7 @@ public class Skaipeuh{
 		if(cmd.startsWith("TCP")){
 		    String portUser= (recepteur.tab.returnInfoUser(Integer.parseInt(cmd.substring(4)))).substring(29);
 		    System.out.println(portUser);
-		    ClientTCP client = new ClientTCP(Integer.parseInt(portUser)); 
-		    Thread  t3 = new Thread(client);
-		    t3.start();
+		    lanceClient(Integer.parseInt(portUser));
 		}
 
 	    }
@@ -96,5 +94,24 @@ public class Skaipeuh{
 	    System.out.println("Erreur Skaipeuh\n"+e);
 	}
     }
+
+    static void lanceClient(int port){
+	try{
+	    Socket s = new Socket("localhost" , port);
+
+	    ThreadWRI wri = new ThreadWRI(port,s);		
+	    Thread t1 = new Thread(wri);
+	    ThreadREAD read = new ThreadREAD(port, s);		
+	    Thread t2 = new Thread(read);
+
+	    t1.start();
+	    t2.run();
+	}
+	catch(Exception e){
+	    System.out.println("Erreur ClientTCP\n"+e);
+	}
+    }
+
 }
+
 
