@@ -12,12 +12,37 @@ public class TabUser{
     }
 
 
-    public  void afficheUserConnect(){
+    public void afficheUserConnect(boolean erase){
 	int i;
-	for(i=0; i<nbEle; i++)
-	    System.out.println(tabUser[i]);
+	if(erase)
+	    System.out.print("\033c");
+	
+	if(nbEle == 0){
+	    System.out.println("Personne n'est connectee");
+	}
+	else{
+	    System.out.println("      - Liste des personnes - \n");
+	    System.out.println("    nom     |    adresse    | port ");
+	    System.out.println("------------+---------------+------");
+  
+	    for(i=0; i < nbEle; i++){
+		System.out.println(tabUser[i]);
+	    }
+	    System.out.println("------------+---------------+------\n");
+	}
+
+	System.out.println("- BYE pour se deconnecter");
+	System.out.println("- RFH pour rafraichir\n");
+
     }
     
+    public void afficheEvent(String msg){
+	    System.out.print("\033c");
+	    System.out.println("##################################");
+	    System.out.println(msg);
+	    System.out.println("##################################\n");
+	    this.afficheUserConnect(false);
+    }
 
     public void clearTabUser(){
 	int i;
@@ -49,40 +74,17 @@ public class TabUser{
 	if(nbEle>0){
 	    for(i=0; i<nbEle; i++){
 		if(user.equals(tabUser[i].substring(4, 12))){
-		    // System.out.println("if");
 		    nbEle--;
 		    break;
 		}
 	    }
 	    for(j=i; j<nbEle; j++){
-		//	System.out.println("if");
 		tabUser[j] =tabUser[j+1];
 	    }
 	}
 
 	else{
 	    System.out.println("tabUser vide");
-	}
-	
+	}	
     }
-
-
-
-
-
-
-    public static void main(String[] args){
-	TabUser t = new TabUser();
-	t.addUser("HLO safir    192.168.000.014 01234");
-	t.addUser("HLO safir    192.168.000.014 01234");
-	t.addUser("HLO safir    192.168.000.014 01234");
-	t.addUser("HLO safir    192.168.000.014 01234");
-	t.addUser("HLO marc    192.168.000.014 01234");
-	System.out.println(t.nbEle);
-	//t.removeUser("marc    ");
-	t.afficheUserConnect();
-
-    }
-
-
 }

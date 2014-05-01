@@ -7,23 +7,31 @@ public class Skaipeuh{
 
     public static void main(String[] args){
 	try {
+	    String user = "";
+	    String port = "";
+	    String IPgroup = "224.5.6.7";
+	    int PORTgroup = 9876;
+	    
+	    String machine, cmd;
+	    String IAM, HLO, BYE, BAN;
+	    InetAddress localeAdresse;	
+	    Scanner sc;   
 
-	    int PORT1=0;
-	    String user="";
-	    String machine, port, IAM;
 	    Recepteur recepteur;
 	    Emetteur emetteur;
-	    InetAddress localeAdresse;
 	   
 	    ServeurTCP serveur;
-	    Thread t1, t2, t3;
+	    Thread t1, t2;
+
+
 	   
 	    if(args.length==2){
-		PORT1=Integer.parseInt(args[0]);
-		user=args[1];	   
+		user=args[0];
+		port=args[1];
+				
 	    }
 	    else{
-		System.out.println("manque les ports ");
+		System.out.println("Probleme avec les arguments ");
 		System.exit(0);
 	    }	
 	
@@ -31,66 +39,53 @@ public class Skaipeuh{
 	    machine = localeAdresse.getHostAddress();
 	    user = Bourrage.bourrageUser(user);
 	    machine = Bourrage.bourrageMachine(machine);
-	    port = Bourrage.bourragePort(PORT1+"");
+	    port = Bourrage.bourragePort(port);
 
-
-	    IAM = "IAM "+ user + " " + machine + " " +port;
-	    recepteur = new Recepteur(IAM);
+	    IAM = "IAM "+user+" "+machine+" "+port;
+	    HLO = "HLO "+user+" "+machine+" "+port;
+	    BYE = "BYE "+user;
+	    BAN = "BAN "+user;
+	   
+	    recepteur = new Recepteur(IAM, BYE, BAN, IPgroup, PORTgroup);
 	    t1 = new Thread(recepteur);
 	    t1.start();
 
+	    emetteur = new Emetteur(IPgroup, PORTgroup);
+	    emetteur.lance(HLO);
 
-	    emetteur = new Emetteur("HLO", user, machine, port );
-	    emetteur.lance();
-
-	    serveur = new ServeurTCP(PORT1);
+	    serveur = new ServeurTCP(Integer.parseInt(port));
 	    t2 = new Thread(serveur);
 	    t2.start();       
 
-	    String cmd,tmp;
-	    boolean flag= true;
-	    BufferedInputStream text = new BufferedInputStream(System.in);
-	    Scanner sc = new Scanner(System.in);
+	    sc = new Scanner(System.in);
+	    recepteur.tab.afficheUserConnect(true);
 	    while(true){
+		cmd = sc.nextLine();
 
-	
-		    cmd = sc.nextLine();
-		    if(cmd.equals("BYE")){
-			emetteur = new Emetteur("BYE", user);
-			emetteur.lance();
-			System.exit(0);
-		    }
+		if(cmd.equals("BYE")){
+		    emetteur.lance(BYE);
+		    System.exit(0);
+		}
 		
 
-		    if(cmd.equals("RFH")){
-			emetteur = new Emetteur("RFH");
-			emetteur.lance();
-		    }
-		    
-		    
-		    if(cmd.startsWith("BAN")){
-			tmp = cmd.substring(4);
-			tmp = Bourrage.bourrageUser(tmp);
-			emetteur = new Emetteur("BAN " + tmp);
-			emetteur.lance();
-		    }
-		    if(cmd.equals("WHO")){
-			recepteur.tab.afficheUserConnect();
-		    }
-
-		  
-	
-		/*	if(ServeurTCP.accept && flag){
-			client = new ClientTCP(Integer.parseInt(port)); 
-			t3 = new Thread(client);
-			t3.start();
-			flag=false;
-			}*/
+		if(cmd.equals("RFH")){
+		    emetteur.lance("RFH");
+		}
+		    	    
+		if(cmd.startsWith("BAN")){
+		    BAN = cmd.substring(4);
+		    BAN = "BAN "+ Bourrage.bourrageUser(BAN);
+		    emetteur.lance(BAN);
+		}
+		   
+		if(cmd.equals("AFF")){
+		    recepteur.tab.afficheUserConnect(true);
+		}
 	    }
 	}
-	    catch (Exception e) {
-		System.out.println("Erreur while Skype\n"+e);
-	    }
+	catch (Exception e) {
+	    System.out.println("Erreur Skaipeuh\n"+e);
 	}
     }
+}
 
