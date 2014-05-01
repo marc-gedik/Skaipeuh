@@ -41,12 +41,12 @@ public class Bourrage{
     }
 
 
-    public static String bourragePort(String port){
+    public static String bourrage(String port, int taille, String motif){
 	int i;
 	String str="";
-	if(port.length()<5)
-	    for(i=0; (i< 5-port.length()); i++ )
-		str+='0';
+	if(port.length()<taille)
+	    for(i=0; (i< taille-port.length()); i++ )
+		str+=motif;
 	str+=port;
 	return str;
 

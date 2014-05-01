@@ -12,6 +12,13 @@ public class TabUser{
     }
 
 
+
+    public String returnInfoUser(int indice){
+	if(indice <= nbEle)
+	    return tabUser[indice];
+	return null;
+    }
+
     public void afficheUserConnect(boolean erase){
 	int i;
 	if(erase)
@@ -21,14 +28,14 @@ public class TabUser{
 	    System.out.println("Personne n'est connectee");
 	}
 	else{
-	    System.out.println("      - Liste des personnes - \n");
-	    System.out.println("    nom     |    adresse    | port ");
-	    System.out.println("------------+---------------+------");
+	    System.out.println("           - Liste des personnes - \n");
+	    System.out.println("       nom       |    adresse    | port ");
+	    System.out.println("-----------------+---------------+------");
   
 	    for(i=0; i < nbEle; i++){
-		System.out.println(tabUser[i]);
+		System.out.println(Bourrage.bourrage(i+"", 2, " ")+" - "+tabUser[i]);
 	    }
-	    System.out.println("------------+---------------+------\n");
+	    System.out.println("-----------------+---------------+------\n");
 	}
 
 	System.out.println("- BYE pour se deconnecter");

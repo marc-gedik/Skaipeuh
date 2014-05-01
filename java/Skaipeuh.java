@@ -39,7 +39,7 @@ public class Skaipeuh{
 	    machine = localeAdresse.getHostAddress();
 	    user = Bourrage.bourrageUser(user);
 	    machine = Bourrage.bourrageMachine(machine);
-	    port = Bourrage.bourragePort(port);
+	    port = Bourrage.bourrage(port, 5, "0");
 
 	    IAM = "IAM "+user+" "+machine+" "+port;
 	    HLO = "HLO "+user+" "+machine+" "+port;
@@ -81,6 +81,15 @@ public class Skaipeuh{
 		if(cmd.equals("AFF")){
 		    recepteur.tab.afficheUserConnect(true);
 		}
+
+		if(cmd.startsWith("TCP")){
+		    String portUser= (recepteur.tab.returnInfoUser(Integer.parseInt(cmd.substring(4)))).substring(29);
+		    System.out.println(portUser);
+		    ClientTCP client = new ClientTCP(Integer.parseInt(portUser)); 
+		    Thread  t3 = new Thread(client);
+		    t3.start();
+		}
+
 	    }
 	}
 	catch (Exception e) {

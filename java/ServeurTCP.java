@@ -23,7 +23,7 @@ class ServeurTCP implements Runnable{
 	    ClientTCP client = new ClientTCP(Integer.parseInt(PORT+"")); 
 	    Thread  t3 = new Thread(client);
 	    t3.start();
- sSent= ss.accept();
+	    sSent= ss.accept();
 	    System.out.println("Connection etablie");
 
 
