@@ -6,6 +6,7 @@ class ServeurTCP implements Runnable{
 
     int PORT;
     static boolean accept = false;
+	static boolean running = true;
 
     public ServeurTCP(int p){
 	this.PORT = p; 

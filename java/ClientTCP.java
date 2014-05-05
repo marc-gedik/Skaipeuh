@@ -15,9 +15,9 @@ public class ClientTCP implements Runnable{
 	try{
 	    Socket s = new Socket("localhost" , PORT);
 
-	    ThreadWRI wri = new ThreadWRI(PORT,s);		
+	    ThreadWRI wri = new ThreadWRI(s);		
 	    Thread t1 = new Thread(wri);
-	    ThreadREAD read = new ThreadREAD(PORT, s);		
+	    ThreadREAD read = new ThreadREAD(s);		
 	    Thread t2 = new Thread(read);
 
 	    t1.start();
