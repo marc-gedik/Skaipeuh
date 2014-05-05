@@ -18,14 +18,10 @@ class ServeurTCP implements Runnable{
 	    sRcv= ss.accept();
 	    accept=true;
 	    System.out.println("Une personne souhaite vous parler");
-	   
-
-	    ClientTCP client = new ClientTCP(Integer.parseInt(PORT+"")); 
-	    Thread  t3 = new Thread(client);
-	    t3.start();
+	    
+	 
 	    sSent= ss.accept();
 	    System.out.println("Connection etablie");
-
 
 
 	    ServeurThread read = new ServeurThread(sSent, sRcv);		
@@ -35,6 +31,7 @@ class ServeurTCP implements Runnable{
 
 	    t1.start();
 	    t2.run();
+	    System.out.println("fin serveur");
 	} 
 	catch (IOException e) {
 	    System.out.println("Erreur ServeurTCP\n" + e);

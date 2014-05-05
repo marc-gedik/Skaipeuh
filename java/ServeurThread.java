@@ -24,14 +24,25 @@ public class ServeurThread implements Runnable{
 	    int len;
 	    br = new BufferedReader(new InputStreamReader(s1.getInputStream()));
 	    pw = new PrintWriter(new OutputStreamWriter(s2.getOutputStream()));
-	    
-	    while(true){
-		System.out.println("Serveur en attente ...");
+	    boolean running =true;
+	    while(running){
+		//	System.out.println("Serveur en attente ...");
 		len = br.read(buff, 0, buff.length);
+		if(len > 2 && buff[0] == 'C' && buff[1] == 'L' && buff[2] == 'O'){
+		    pw.write(buff, 0, len);
+		    pw.flush();
+		    s1.close();
+		    s2.close();
+		    running =false;
+		}
+		else{
+		    pw.write(buff, 0, len);
+		    pw.flush();
+		}
 
-		pw.write(buff, 0, len);
-		pw.flush();
+	
 	    }
+	    System.out.println("fin serveurhtread");
 	}
 	catch(java.io.IOException e){
 	    System.out.println("Erreur ServeurThread\n"+e);

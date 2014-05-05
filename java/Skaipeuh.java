@@ -23,7 +23,6 @@ public class Skaipeuh{
 	    ServeurTCP serveur;
 	    Thread t1, t2;
 
-
 	   
 	    if(args.length==2){
 		user=args[0];
@@ -84,9 +83,13 @@ public class Skaipeuh{
 
 		if(cmd.startsWith("TCP")){
 		    String portUser= (recepteur.tab.returnInfoUser(Integer.parseInt(cmd.substring(4)))).substring(29);
-		    System.out.println(portUser);
 		    lanceClient(Integer.parseInt(portUser));
 		}
+		
+		if(ServeurTCP.accept==true){
+		    lanceClient(Integer.parseInt(port));
+		}
+
 
 	    }
 	}
@@ -103,9 +106,12 @@ public class Skaipeuh{
 	    Thread t1 = new Thread(wri);
 	    ThreadREAD read = new ThreadREAD(port, s);		
 	    Thread t2 = new Thread(read);
-
 	    t1.start();
 	    t2.run();
+	    t1.join();
+	    s.close();
+	    ServeurTCP.accept=false;
+	    System.out.println("false");
 	}
 	catch(Exception e){
 	    System.out.println("Erreur ClientTCP\n"+e);
