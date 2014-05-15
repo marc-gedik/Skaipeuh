@@ -21,8 +21,8 @@ public class TabUser{
 
     public void afficheUserConnect(boolean erase){
 	int i;
-	if(erase)
-	    System.out.print("\033c");
+//	if(erase)
+//	    System.out.print("\033c");
 	
 	if(nbEle == 0){
 	    System.out.println("Personne n'est connectee");

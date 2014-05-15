@@ -136,7 +136,7 @@ void client(int sock, char * adresse){
 	buff[0] = 'M', buff[1] = 'S', buff[2] = 'G', buff[3] = ' ';
 	int_bourrage(strlen(buff+8), 3, buff+4);
 	buff[7] = ' ';
-	write(sock, buff, strlen(buff) + 8);
+	write(sock, buff, strlen(buff));
       }
     }
     if(polls[1].revents == POLLIN){

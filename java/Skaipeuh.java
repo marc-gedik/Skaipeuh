@@ -1,35 +1,31 @@
 import java.net.*;
-import java.io.*;
-import java.util.Scanner;
 
 public class Skaipeuh {
 
+	public static final String IPgroup = "224.5.6.7";
+	public static final int PORTgroup = 9876;
+
+	private Recepteur recepteur;
+	private Emetteur emetteur;
+	private String IAM, HLO, BYE, BAN;
+
 	public static void main(String[] args) {
+		if (args.length == 2) {
+			new Skaipeuh(args[0], args[1]);
+
+		} else {
+			System.out.println("Probleme avec les arguments ");
+			System.exit(0);
+		}
+	}
+
+	public Skaipeuh(String user, String port) {
 		try {
-			String user = "";
-			String port = "";
-			String IPgroup = "224.5.6.7";
-			int PORTgroup = 9876;
-
-			String machine, cmd;
-			String IAM, HLO, BYE, BAN;
+			String machine;
 			InetAddress localeAdresse;
-			Scanner sc;
-
-			Recepteur recepteur;
-			Emetteur emetteur;
 
 			ServeurTCP serveur;
 			Thread t1, t2;
-
-			if (args.length == 2) {
-				user = args[0];
-				port = args[1];
-
-			} else {
-				System.out.println("Probleme avec les arguments ");
-				System.exit(0);
-			}
 
 			localeAdresse = InetAddress.getLocalHost();
 			machine = localeAdresse.getHostAddress();
@@ -53,63 +49,50 @@ public class Skaipeuh {
 			t2 = new Thread(serveur);
 			t2.start();
 
-			sc = new Scanner(System.in);
 			recepteur.tab.afficheUserConnect(true);
-			while (sc.hasNext()) {
-				System.out.println("ok");
-				cmd = sc.nextLine();
-
-				if (cmd.equals("BYE")) {
-					emetteur.lance(BYE);
-					System.exit(0);
-				}
-
-				if (cmd.equals("RFH")) {
-					emetteur.lance("RFH");
-				}
-
-				if (cmd.startsWith("BAN")) {
-					BAN = cmd.substring(4);
-					BAN = "BAN " + Bourrage.bourrageUser(BAN);
-					emetteur.lance(BAN);
-				}
-
-				if (cmd.equals("AFF")) {
-					recepteur.tab.afficheUserConnect(true);
-				}
-
-				if (cmd.startsWith("TCP")) {
-					String portUser = (recepteur.tab.returnInfoUser(Integer
-							.parseInt(cmd.substring(4)))).substring(29);
-					lanceClient(Integer.parseInt(portUser));
-				}
-
-				if (ServeurTCP.accept == true) {
-					lanceClient(Integer.parseInt(port));
-				}
-
-			}
-		} catch (Exception e) {
-			System.out.println("Erreur Skaipeuh\n" + e);
+			
+			new MyScanner(this);
+		} catch (UnknownHostException e) {
+			System.out.println("Skaipeuh getLocalHost - ");
+			e.printStackTrace();
 		}
 	}
 
-	static void lanceClient(int port) {
+	static void lanceClient(String adresse, int port) {
 		try {
-			Socket s = new Socket("localhost", port);
+			ServeurTCP.running = true;
+			Socket s = new Socket(adresse, port);
 
 			ThreadWRI wri = new ThreadWRI(s);
-			Thread t1 = new Thread(wri);
+			MyScanner.setClient(wri);
 			ThreadREAD read = new ThreadREAD(s);
-			Thread t2 = new Thread(read);
-			t1.start();
-			t2.run();
-			t1.join();
-			ServeurTCP.accept = false;
-			System.out.println("false");
+			MyScanner.setFileAccepter(read);
+			Thread t = new Thread(read);
+			t.start();
 		} catch (Exception e) {
 			System.out.println("Erreur ClientTCP\n" + e);
 		}
 	}
 
+	public void run(String s) {
+		if (s.equals("BYE")) {
+			emetteur.lance(BYE);
+			System.exit(0);
+		} else if (s.equals("RFH")) {
+			emetteur.lance("RFH");
+		} else if (s.startsWith("BAN")) {
+			BAN = s.substring(4);
+			BAN = "BAN " + Bourrage.bourrageUser(BAN);
+			emetteur.lance(BAN);
+		} else if (s.equals("AFF")) {
+			recepteur.tab.afficheUserConnect(true);
+		} else if (s.startsWith("TCP")) {
+			int id = Integer.parseInt(s.substring(4));
+			String portUser = (recepteur.tab.returnInfoUser(id)).substring(29);
+			String adresse = (recepteur.tab.returnInfoUser(id)).substring(13,
+					28);
+			System.out.println(adresse);
+			lanceClient(adresse, Integer.parseInt(portUser));
+		}
+	}
 }

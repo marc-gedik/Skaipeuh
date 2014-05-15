@@ -21,14 +21,11 @@ public class ServeurThread implements Runnable {
 			pw = new PrintWriter(new OutputStreamWriter(s2.getOutputStream()));
 			boolean running = true;
 			while (running) {
-				// System.out.println("Serveur en attente ...");
 				len = br.read(buff, 0, buff.length);
 				if (len > 2 && buff[0] == 'C' && buff[1] == 'L'
 						&& buff[2] == 'O') {
 					pw.write(buff, 0, len);
 					pw.flush();
-					s1.close();
-					s2.close();
 					running = false;
 				} else {
 					pw.write(buff, 0, len);
@@ -38,6 +35,9 @@ public class ServeurThread implements Runnable {
 			System.out.println("fin serveurhtread");
 		} catch (java.io.IOException e) {
 			System.out.println("Erreur ServeurThread\n" + e);
+		}
+		catch (Exception e) {
+			System.out.println("Erreur");
 		}
 	}
 }
