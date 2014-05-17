@@ -17,12 +17,11 @@ public class MyScanner implements Runnable {
 	public void run() {
 		Scanner sc = new Scanner(System.in);
 		String s;
-
 		while (true) {
 			s = sc.nextLine();
 			switch (where) {
 			case SKAIPEUH:
-				skaipeuh.run(s);
+				skaipeuh.lance(s);
 				break;
 			case CLIENT:
 				client.write(s);

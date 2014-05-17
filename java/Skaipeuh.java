@@ -31,7 +31,7 @@ public class Skaipeuh {
 			machine = localeAdresse.getHostAddress();
 			user = Bourrage.bourrageUser(user);
 			machine = Bourrage.bourrageMachine(machine);
-			port = Bourrage.bourrage(port, 5, "0");
+			port = Bourrage.bourrage(port, 5, "0", true);
 
 			IAM = "IAM " + user + " " + machine + " " + port;
 			HLO = "HLO " + user + " " + machine + " " + port;
@@ -52,12 +52,41 @@ public class Skaipeuh {
 			recepteur.tab.afficheUserConnect(true);
 			
 			new MyScanner(this);
+		
 		} catch (UnknownHostException e) {
 			System.out.println("Skaipeuh getLocalHost - ");
 			e.printStackTrace();
 		}
 	}
 
+
+	public void lance(String s) {
+		if (s.equals("BYE")) {
+			emetteur.lance(BYE);
+			System.exit(0);
+		} 
+		else if (s.equals("RFH")) {
+			emetteur.lance("RFH");
+		}
+		else if (s.startsWith("BAN")) {
+			BAN = s.substring(4);
+			BAN = "BAN " + Bourrage.bourrageUser(BAN);
+			emetteur.lance(BAN);
+		}
+		else if (s.equals("AFF")) {
+			recepteur.tab.afficheUserConnect(true);
+		}
+		else if (s.startsWith("TCP")) {
+			int id = Integer.parseInt(s.substring(4));
+			String portUser = (recepteur.tab.returnInfoUser(id)).substring(29);
+			String adresse = (recepteur.tab.returnInfoUser(id)).substring(13,28);
+			System.out.println(adresse);
+			lanceClient(adresse, Integer.parseInt(portUser));
+		}
+						
+	}
+	
+	
 	static void lanceClient(String adresse, int port) {
 		try {
 			ServeurTCP.running = true;
@@ -71,28 +100,6 @@ public class Skaipeuh {
 			t.start();
 		} catch (Exception e) {
 			System.out.println("Erreur ClientTCP\n" + e);
-		}
-	}
-
-	public void run(String s) {
-		if (s.equals("BYE")) {
-			emetteur.lance(BYE);
-			System.exit(0);
-		} else if (s.equals("RFH")) {
-			emetteur.lance("RFH");
-		} else if (s.startsWith("BAN")) {
-			BAN = s.substring(4);
-			BAN = "BAN " + Bourrage.bourrageUser(BAN);
-			emetteur.lance(BAN);
-		} else if (s.equals("AFF")) {
-			recepteur.tab.afficheUserConnect(true);
-		} else if (s.startsWith("TCP")) {
-			int id = Integer.parseInt(s.substring(4));
-			String portUser = (recepteur.tab.returnInfoUser(id)).substring(29);
-			String adresse = (recepteur.tab.returnInfoUser(id)).substring(13,
-					28);
-			System.out.println(adresse);
-			lanceClient(adresse, Integer.parseInt(portUser));
 		}
 	}
 }

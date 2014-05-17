@@ -26,37 +26,46 @@ public class ThreadWRI {
 			pw.flush();
 			close();
 		}
+		
 		if (msg.startsWith("FIL") && msg.length() > 4) {
 			filename = msg.substring(4);
 			file = new File(filename);
+			
 			if (file.isFile()) {
 				System.out.println("Sur quel port envoyer ?");
 				MyScanner.toFile();
-			} else
-				System.out.println("Le fichier " + msg.substring(4)
-						+ " n'existe pas");
-		} else {
+			} 
+			else{
+				System.out.println("Le fichier " + msg.substring(4)+ " n'existe pas");
+			} 
+		
+		}
+		else {
 			taille = String.valueOf(msg.length());
-			send = "MSG " + Bourrage.bourrage(taille, 3, "0") + " " + msg;
+			send = "MSG " + Bourrage.bourrage(taille, 3, "0",true) + " " + msg;
 			pw.print(send);
 			pw.flush();
 		}
 	}
 
 	public void readFile(String msg) {
-		int port;
+		String port;
 		char[] buff = new char[3];
+		Thread t1;
 
 		try {
-			port = Integer.parseInt(msg);
-			//TODO bourrer le nom du fichier et le numero de port
+			filename = Bourrage.bourrage(filename, 40, " ", false);
+			port = Bourrage.bourrage(msg, 5, "0", true);
 			pw.print("FIL " + file.length() + " " + filename + " " + port);
 			pw.flush();
-			//TODO petit bug le print ne se fait pas
 			bf.read(buff, 0, 3);
+
 			if (buff[0] == 'A' && buff[1] == 'C' && buff[2] == 'K') {
 				System.out.println("TODO envoyer le fichier");
 				// envoyer le fichier
+				ClientFIL clientFIL = new ClientFIL(Integer.parseInt(port), s, file);
+				t1 = new Thread(clientFIL);
+				t1.start();
 			} else
 				System.out.println("l'echange a ete refuse");
 		} catch (NumberFormatException e) {

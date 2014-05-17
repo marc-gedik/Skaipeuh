@@ -14,7 +14,7 @@ public class ThreadREAD implements Runnable {
 	public void run() {
 		try {
 
-			char[] buff = new char[508];
+			char[] buff = new char[512];
 			char c;
 			BufferedReader br;
 			PrintWriter pw;
@@ -22,11 +22,14 @@ public class ThreadREAD implements Runnable {
 			String taille, filename;
 			br = new BufferedReader(new InputStreamReader(s.getInputStream()));
 			pw = new PrintWriter(new OutputStreamWriter(s.getOutputStream()));
+			ServeurFIC serveurFIC;
+			Thread t1;
 
 			while (ServeurTCP.running) {
 				try {
 					br.read(buff, 0, 3);
 				} catch (SocketException e) {
+					System.out.println("Erreur read prefixe du message\n"+e);
 				}
 
 				if (buff[0] == 'M' && buff[1] == 'S' && buff[2] == 'G') {
@@ -41,37 +44,51 @@ public class ThreadREAD implements Runnable {
 					for (int i = 0; i < len; i++)
 						System.out.print(buff[i]);
 					System.out.println("");
-				} else if (buff[0] == 'C' && buff[1] == 'L' && buff[2] == 'O') {
+				} 
+			
+				else if (buff[0] == 'C' && buff[1] == 'L' && buff[2] == 'O') {
 					System.out.println("Conversation terminée");
 					ServeurTCP.running = false;
 					s.close();
 					MyScanner.toMain();
-				} else if (buff[0] == 'F' && buff[1] == 'I' && buff[2] == 'L') {
+				} 
+				
+				
+				else if (buff[0] == 'F' && buff[1] == 'I' && buff[2] == 'L') {
 					br.read();
 					taille = "";
 					while ((c = (char) br.read()) != ' ' && c != -1)
 						taille += c;
+					
 					len = Integer.parseInt(taille);
 					br.read(buff, 0, 40);
 					filename = "";
 					for (int i = 0; i < 40; i++)
 						filename += buff[i];
+					
 					br.read();
 					br.read(buff, 0, 5);
-					fileSize = Integer.parseInt(buff[0] + "" + buff[1] + ""
-							+ buff[2] + "" + buff[3] + "" + buff[4]);
+					fileSize = Integer.parseInt(buff[0] + "" + buff[1] + ""	+ buff[2] + "" + buff[3] + "" + buff[4]);
 					filename = filename.trim();
-					System.out.println("Accepter l'echange " + filename + " ("
-							+ fileSize + ")?(y/n)");
+					
+					System.out.println("Accepter l'échange " + filename + " (" + fileSize + ")?(y/n)");
 					MyScanner.toFileAccept();
+					
 					synchronized (this) {
 						wait();
 					}
+					
 					if (fileAccepted) {
-						// TODO Lancer le serveur
+						//merde
+						
+						serveurFIC = new ServeurFIC(PORT, fileSize, filename, s);
+						t1 = new Thread(serveurFIC);
+						t1.start();
 						System.out.println("L'echange va etre effectuer");
 						pw.print("ACK");
-					} else {
+					}
+					
+					else {
 						System.out.println("Vous avez refusé le fichier");
 						pw.print("NAK");
 					}

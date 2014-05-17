@@ -35,14 +35,22 @@ public class Bourrage {
 		return str.substring(0, str.length() - 1);
 	}
 
-	public static String bourrage(String port, int taille, String motif) {
+	public static String bourrage(String mot, int taille, String motif, boolean cote) {
 		int i;
-		String str = "";
-		if (port.length() < taille)
-			for (i = 0; (i < taille - port.length()); i++)
+		String str ;
+		if( cote==true)
+			str="";
+		else
+			str= mot;
+		
+		if (mot.length() < taille)
+			for (i = 0; (i < taille - mot.length()); i++)
 				str += motif;
-		str += port;
+			
+		if(cote==true)
+			str+=mot;
+
 		return str;
 
-	}
+}
 }

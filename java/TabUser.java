@@ -33,7 +33,7 @@ public class TabUser{
 	    System.out.println("---+---------+---------------+------");
   
 	    for(i=0; i < nbEle; i++){
-		System.out.println(Bourrage.bourrage(i+"", 2, " ")+"   "+tabUser[i].substring(4));
+		System.out.println(Bourrage.bourrage(i+"", 2, " ", true)+"   "+tabUser[i].substring(4));
 	    }
 	    System.out.println("---+---------+---------------+------\n");
 	}
@@ -45,9 +45,9 @@ public class TabUser{
     
     public void afficheEvent(String msg){
 	    System.out.print("\033c");
-	    System.out.println("##################################");
+	    System.out.println("####################################");
 	    System.out.println(msg);
-	    System.out.println("##################################\n");
+	    System.out.println("####################################\n");
 	    this.afficheUserConnect(false);
     }
 
