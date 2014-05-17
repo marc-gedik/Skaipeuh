@@ -31,7 +31,7 @@ public class Skaipeuh {
 			machine = localeAdresse.getHostAddress();
 			user = Bourrage.bourrageUser(user);
 			machine = Bourrage.bourrageMachine(machine);
-			port = Bourrage.bourrage(port, 5, "0");
+			port = Bourrage.leftBourrage(port, 5, "0");
 
 			IAM = "IAM " + user + " " + machine + " " + port;
 			HLO = "HLO " + user + " " + machine + " " + port;
@@ -50,7 +50,7 @@ public class Skaipeuh {
 			t2.start();
 
 			recepteur.tab.afficheUserConnect(true);
-			
+
 			new MyScanner(this);
 		} catch (UnknownHostException e) {
 			System.out.println("Skaipeuh getLocalHost - ");
@@ -58,14 +58,14 @@ public class Skaipeuh {
 		}
 	}
 
-	static void lanceClient(String adresse, int port) {
+	static void lanceClient(String clientAdresse, String personAdresse, int port) {
 		try {
 			ServeurTCP.running = true;
-			Socket s = new Socket(adresse, port);
+			Socket s = new Socket(clientAdresse, port);
 
-			ThreadWRI wri = new ThreadWRI(s);
+			ThreadWRI wri = new ThreadWRI(s, personAdresse);
 			MyScanner.setClient(wri);
-			ThreadREAD read = new ThreadREAD(s);
+			ThreadREAD read = new ThreadREAD(s, personAdresse, wri);
 			MyScanner.setFileAccepter(read);
 			Thread t = new Thread(read);
 			t.start();
@@ -74,7 +74,7 @@ public class Skaipeuh {
 		}
 	}
 
-	public void run(String s) {
+	public void lance(String s) {
 		if (s.equals("BYE")) {
 			emetteur.lance(BYE);
 			System.exit(0);
@@ -91,8 +91,7 @@ public class Skaipeuh {
 			String portUser = (recepteur.tab.returnInfoUser(id)).substring(29);
 			String adresse = (recepteur.tab.returnInfoUser(id)).substring(13,
 					28);
-			System.out.println(adresse);
-			lanceClient(adresse, Integer.parseInt(portUser));
+			lanceClient(adresse, adresse, Integer.parseInt(portUser));
 		}
 	}
 }

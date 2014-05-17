@@ -3,12 +3,13 @@ import java.io.*;
 
 public class ThreadREAD implements Runnable {
 
-	int PORT;
 	Socket s;
 	private boolean fileAccepted;
+	private ThreadWRI wri;
 
-	public ThreadREAD(Socket s) {
+	public ThreadREAD(Socket s, String adresse, ThreadWRI wri) {
 		this.s = s;
+		this.wri = wri;
 	}
 
 	public void run() {
@@ -18,7 +19,7 @@ public class ThreadREAD implements Runnable {
 			char c;
 			BufferedReader br;
 			PrintWriter pw;
-			int len, fileSize;
+			int port, len, fileSize;
 			String taille, filename;
 			br = new BufferedReader(new InputStreamReader(s.getInputStream()));
 			pw = new PrintWriter(new OutputStreamWriter(s.getOutputStream()));
@@ -51,15 +52,16 @@ public class ThreadREAD implements Runnable {
 					taille = "";
 					while ((c = (char) br.read()) != ' ' && c != -1)
 						taille += c;
-					len = Integer.parseInt(taille);
+					fileSize = Integer.parseInt(taille);
 					br.read(buff, 0, 40);
 					filename = "";
 					for (int i = 0; i < 40; i++)
 						filename += buff[i];
 					br.read();
 					br.read(buff, 0, 5);
-					fileSize = Integer.parseInt(buff[0] + "" + buff[1] + ""
+					port = Integer.parseInt(buff[0] + "" + buff[1] + ""
 							+ buff[2] + "" + buff[3] + "" + buff[4]);
+					
 					filename = filename.trim();
 					System.out.println("Accepter l'echange " + filename + " ("
 							+ fileSize + ")?(y/n)");
@@ -68,7 +70,9 @@ public class ThreadREAD implements Runnable {
 						wait();
 					}
 					if (fileAccepted) {
-						// TODO Lancer le serveur
+						ReceveFile receveFile = new ReceveFile(port, filename, fileSize);
+						new Thread(receveFile).start();
+						
 						System.out.println("L'echange va etre effectuer");
 						pw.print("ACK");
 					} else {
@@ -76,12 +80,24 @@ public class ThreadREAD implements Runnable {
 						pw.print("NAK");
 					}
 					pw.flush();
+				} else if (buff[0] == 'A' && buff[1] == 'C' && buff[2] == 'K') {
+					fichierAccepter(true);
+				} else if (buff[0] == 'A' && buff[1] == 'C' && buff[2] == 'K') {
+					fichierAccepter(false);
 				}
 			}
 		} catch (IOException e) {
 			System.out.println("Erreur ThreadREAD\n" + e);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void fichierAccepter(boolean b) {
+		System.out.println("Fichier " + (b ? "accepter" : "refuser"));
+		ThreadWRI.fichierAccepter = b;
+		synchronized (wri) {
+			wri.notify();
 		}
 	}
 

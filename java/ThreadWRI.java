@@ -8,9 +8,12 @@ public class ThreadWRI {
 	private BufferedReader bf;
 	private File file;
 	private String filename;
+	private String adresse;
+	static boolean fichierAccepter;
 
-	public ThreadWRI(Socket s) {
+	public ThreadWRI(Socket s, String adresse) {
 		this.s = s;
+		this.adresse = adresse;
 		try {
 			pw = new PrintWriter(new OutputStreamWriter(s.getOutputStream()));
 			bf = new BufferedReader(new InputStreamReader(s.getInputStream()));
@@ -37,32 +40,41 @@ public class ThreadWRI {
 						+ " n'existe pas");
 		} else {
 			taille = String.valueOf(msg.length());
-			send = "MSG " + Bourrage.bourrage(taille, 3, "0") + " " + msg;
+			send = "MSG " + Bourrage.leftBourrage(taille, 3, "0") + " " + msg;
 			pw.print(send);
 			pw.flush();
 		}
 	}
 
-	public void readFile(String msg) {
-		int port;
+	public void readFile(String port) {
 		char[] buff = new char[3];
-
+		String filenameBourrer;
 		try {
-			port = Integer.parseInt(msg);
-			//TODO bourrer le nom du fichier et le numero de port
-			pw.print("FIL " + file.length() + " " + filename + " " + port);
+			filenameBourrer = Bourrage.rightBourrage(filename, 40, " ");
+			port = Bourrage.leftBourrage(port, 5, "0");
+
+			pw.print("FIL " + file.length() + " " + filenameBourrer + " " + port);
 			pw.flush();
-			//TODO petit bug le print ne se fait pas
-			bf.read(buff, 0, 3);
-			if (buff[0] == 'A' && buff[1] == 'C' && buff[2] == 'K') {
-				System.out.println("TODO envoyer le fichier");
-				// envoyer le fichier
+
+			synchronized (this) {
+				wait();
+			}
+
+			if (fichierAccepter) {
+				SendFile sendFile = new SendFile(filename,
+						Integer.parseInt(port), adresse);
+				new Thread(sendFile).start();
 			} else
 				System.out.println("l'echange a ete refuse");
 		} catch (NumberFormatException e) {
 			System.out.println("Il faut un nombre");
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		finally{
+			fichierAccepter = false;
 		}
 		MyScanner.toClient();
 	}

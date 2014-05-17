@@ -22,7 +22,7 @@ public class MyScanner implements Runnable {
 			s = sc.nextLine();
 			switch (where) {
 			case SKAIPEUH:
-				skaipeuh.run(s);
+				skaipeuh.lance(s);
 				break;
 			case CLIENT:
 				client.write(s);
