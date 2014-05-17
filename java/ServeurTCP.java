@@ -15,13 +15,13 @@ class ServeurTCP implements Runnable {
 			ServerSocket ss = new ServerSocket(port);
 			while (true) {
 				ServeurTCP.running = true;
-				
+
 				Socket sRcv, sSent;
 				sRcv = ss.accept();
 				System.out.println("Une personne souhaite vous parler");
+				Skaipeuh.lanceClient("localhost", sRcv.getInetAddress()
+						.getHostAddress(), port);
 
-				Skaipeuh.lanceClient("localhost", port);
-				
 				sSent = ss.accept();
 				System.out.println("Connection etablie");
 

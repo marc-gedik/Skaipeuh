@@ -31,7 +31,7 @@ public class Skaipeuh {
 			machine = localeAdresse.getHostAddress();
 			user = Bourrage.bourrageUser(user);
 			machine = Bourrage.bourrageMachine(machine);
-			port = Bourrage.bourrage(port, 5, "0", true);
+			port = Bourrage.leftBourrage(port, 5, "0");
 
 			IAM = "IAM " + user + " " + machine + " " + port;
 			HLO = "HLO " + user + " " + machine + " " + port;
@@ -50,7 +50,7 @@ public class Skaipeuh {
 			t2.start();
 
 			recepteur.tab.afficheUserConnect(true);
-			
+
 			new MyScanner(this);
 		
 		} catch (UnknownHostException e) {
@@ -59,6 +59,21 @@ public class Skaipeuh {
 		}
 	}
 
+	static void lanceClient(String clientAdresse, String personAdresse, int port) {
+		try {
+			ServeurTCP.running = true;
+			Socket s = new Socket(clientAdresse, port);
+
+			ThreadWRI wri = new ThreadWRI(s, personAdresse);
+			MyScanner.setClient(wri);
+			ThreadREAD read = new ThreadREAD(s, personAdresse, wri);
+			MyScanner.setFileAccepter(read);
+			Thread t = new Thread(read);
+			t.start();
+		} catch (Exception e) {
+			System.out.println("Erreur ClientTCP\n" + e);
+		}
+	}
 
 	public void lance(String s) {
 		if (s.equals("BYE")) {
@@ -79,27 +94,10 @@ public class Skaipeuh {
 		else if (s.startsWith("TCP")) {
 			int id = Integer.parseInt(s.substring(4));
 			String portUser = (recepteur.tab.returnInfoUser(id)).substring(29);
-			String adresse = (recepteur.tab.returnInfoUser(id)).substring(13,28);
-			System.out.println(adresse);
-			lanceClient(adresse, Integer.parseInt(portUser));
+			String adresse = (recepteur.tab.returnInfoUser(id)).substring(13,
+					28);
+			lanceClient(adresse, adresse, Integer.parseInt(portUser));
 		}
 						
-	}
-	
-	
-	static void lanceClient(String adresse, int port) {
-		try {
-			ServeurTCP.running = true;
-			Socket s = new Socket(adresse, port);
-
-			ThreadWRI wri = new ThreadWRI(s);
-			MyScanner.setClient(wri);
-			ThreadREAD read = new ThreadREAD(s);
-			MyScanner.setFileAccepter(read);
-			Thread t = new Thread(read);
-			t.start();
-		} catch (Exception e) {
-			System.out.println("Erreur ClientTCP\n" + e);
-		}
 	}
 }
