@@ -75,6 +75,6 @@ int j=1;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Fichier enregistr�� �� l'emplacement : " + filename);
+		System.out.println("Fichier enregistré à l'emplacement : " + filename);
 	}
 }
