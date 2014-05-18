@@ -95,7 +95,7 @@ public class ThreadREAD implements Runnable {
 					pw.flush();
 				} else if (buff[0] == 'A' && buff[1] == 'C' && buff[2] == 'K') {
 					fichierAccepter(true);
-				} else if (buff[0] == 'A' && buff[1] == 'C' && buff[2] == 'K') {
+				} else if (buff[0] == 'N' && buff[1] == 'A' && buff[2] == 'K') {
 					fichierAccepter(false);
 				}
 			}
@@ -107,7 +107,7 @@ public class ThreadREAD implements Runnable {
 	}
 
 	private void fichierAccepter(boolean b) {
-		System.out.println("Fichier " + (b ? "accepter" : "refuser"));
+		System.out.println("Fichier " + (b ? "acceptee" : "refusee"));
 		ThreadWRI.fichierAccepter = b;
 		synchronized (wri) {
 			wri.notify();
