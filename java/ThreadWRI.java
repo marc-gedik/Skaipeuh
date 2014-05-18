@@ -29,21 +29,20 @@ public class ThreadWRI {
 			pw.flush();
 			close();
 		}
-		
+
 		if (msg.startsWith("FIL") && msg.length() > 4) {
 			filename = msg.substring(4);
 			file = new File(filename);
-			
+
 			if (file.isFile()) {
 				System.out.println("Sur quel port envoyer ?");
 				MyScanner.toFile();
-			} 
-			else{
-				System.out.println("Le fichier " + msg.substring(4)+ " n'existe pas");
-			} 
-		
-		}
-		else {
+			} else {
+				System.out.println("Le fichier " + msg.substring(4)
+						+ " n'existe pas");
+			}
+
+		} else {
 			taille = String.valueOf(msg.length());
 			send = "MSG " + Bourrage.leftBourrage(taille, 3, "0") + " " + msg;
 			pw.print(send);
@@ -58,7 +57,8 @@ public class ThreadWRI {
 			filenameBourrer = Bourrage.rightBourrage(filename, 40, " ");
 			port = Bourrage.leftBourrage(port, 5, "0");
 
-			pw.print("FIL " + file.length() + " " + filenameBourrer + " " + port);
+			pw.print("FIL " + file.length() + " " + filenameBourrer + " "
+					+ port);
 			pw.flush();
 
 			synchronized (this) {
@@ -74,11 +74,11 @@ public class ThreadWRI {
 		} catch (NumberFormatException e) {
 			System.out.println("Il faut un nombre");
 		} catch (IOException e) {
+			System.out.println("Io exception");
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}
-		finally{
+		} finally {
 			fichierAccepter = false;
 		}
 		MyScanner.toClient();
