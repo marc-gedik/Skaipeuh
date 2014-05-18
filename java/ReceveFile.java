@@ -36,11 +36,11 @@ int j=1;
 			tab = filename.split("/");
 			filename = tab[tab.length - 1];
 			dir = System.getProperty("user.home");
-			f = new File(dir + "/Téléchargements");
+			f = new File(dir + "/Telechargements");
 			if (f.exists() && f.isDirectory())
 			
 				
-				filename = dir + "/Téléchargements/" + filename;
+				filename = dir + "/Telechargements/" + filename;
 			else
 				filename = dir + "/" + filename;
 
@@ -75,6 +75,6 @@ int j=1;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Fichier enregistré à l'emplacement : " + filename);
+		System.out.println("Fichier enregistre a l'emplacement : " + filename);
 	}
 }

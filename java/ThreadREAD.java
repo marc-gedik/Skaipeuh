@@ -87,7 +87,7 @@ public class ThreadREAD implements Runnable {
 					}
 					
 					else {
-						System.out.println("Vous avez refusé le fichier");
+						System.out.println("Vous avez refuse le fichier");
 						pw.print("NAK");
 					}
 					pw.flush();

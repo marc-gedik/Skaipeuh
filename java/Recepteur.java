@@ -39,7 +39,7 @@ public class Recepteur implements Runnable{
 						
 		    if(msg.startsWith("HLO")){
 			flag=false;
-			System.out.println("HLO reçu j'envoie: " + IAM); 
+			//System.out.println("HLO recu j'envoie: " + IAM); 
 			tab.addUser(msg);
 			emetteur.lance(IAM);
 			tab.afficheEvent(msg.substring(4, 12)+" s'est connecte(e)");
@@ -64,7 +64,7 @@ public class Recepteur implements Runnable{
 		    if(msg.startsWith("BYE") && !(msg.equals(BYE))){
 			System.out.println("Message recu:  "+ msg); 
 			tab.removeUser(msg.substring(4, 12));
-			tab.afficheEvent(msg.substring(4, 12)+" s'est déconnecte(e)");
+			tab.afficheEvent(msg.substring(4, 12)+" s'est deconnecte(e)");
 
 		    }
 		   
