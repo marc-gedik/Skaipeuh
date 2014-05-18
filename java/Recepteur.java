@@ -77,7 +77,7 @@ public class Recepteur implements Runnable{
 			}
 			else{
 			    bannisseur2=dp.getAddress();
-			    if((bannisseur2.equals(bannisseur1))){
+			    if(!(bannisseur2.equals(bannisseur1))){
 				emetteur.lance(BYE);
 				System.exit(0);
 			    }
