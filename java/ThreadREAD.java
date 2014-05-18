@@ -39,7 +39,9 @@ public class ThreadREAD implements Runnable {
 							+ Character.toString(buff[2]) + "";
 					len = Integer.parseInt(taille);
 					br.read(buff, 0, len);
-					System.out.print("↳ ");
+					//System.out.print("↳ ");
+					System.out.print(">> ");
+
 					for (int i = 0; i < len; i++)
 						System.out.print(buff[i]);
 					System.out.println("");

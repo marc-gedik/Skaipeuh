@@ -33,7 +33,7 @@ public class SendFile implements Runnable {
 				pw.write(buff, 0, lu);
 				pw.flush();
 			}
-			System.out.println("Envoye réussi");
+			System.out.println("Envoye reussi");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
