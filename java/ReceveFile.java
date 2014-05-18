@@ -24,10 +24,10 @@ public class ReceveFile implements Runnable {
 		FileWriter fileWriter;
 		File f;
 		String dir;
-		String[] tab;
+		String[] tab,mot, racine;
 		char[] buff = new char[500];
 		int i = 0;
-
+int j=1;
 		try {
 			ServerSocket serverSocket;
 			serverSocket = new ServerSocket(port);
@@ -38,13 +38,24 @@ public class ReceveFile implements Runnable {
 			dir = System.getProperty("user.home");
 			f = new File(dir + "/Téléchargements");
 			if (f.exists() && f.isDirectory())
+			
+				
 				filename = dir + "/Téléchargements/" + filename;
 			else
 				filename = dir + "/" + filename;
 
-			f = new File(filename);
-			while (f.exists()) {
-				f = new File(filename + "." + i++);
+			//f = new File(filename);
+			while (new File(filename).exists()) {
+				mot=filename.split("\\.");		
+				racine= mot[0].split("\\(\\d{0,}\\)");
+
+				filename=racine[0]+"("+j+").";
+				for(int k=1; k<mot.length; k++)
+					filename+=mot[k]+".";
+
+				j++;
+				filename =filename.substring(0, filename.length()-1);
+				System.out.println(filename);			
 			}
 			filename = f.getAbsolutePath();
 			fileWriter = new FileWriter(f);
@@ -63,6 +74,6 @@ public class ReceveFile implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Fichier enregistré à l'emlacement : " + filename);
+		System.out.println("Fichier enregistr�� �� l'emplacement : " + filename);
 	}
 }
