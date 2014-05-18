@@ -46,7 +46,7 @@ public class ThreadREAD implements Runnable {
 				} 
 			
 				else if (buff[0] == 'C' && buff[1] == 'L' && buff[2] == 'O') {
-					System.out.println("Conversation terminée");
+					System.out.println("Conversation terminee");
 					ServeurTCP.running = false;
 					s.close();
 					MyScanner.toMain();
@@ -71,7 +71,7 @@ public class ThreadREAD implements Runnable {
 					
 					filename = filename.trim();
 					
-					System.out.println("Accepter l'échange " + filename + " (" + fileSize + ")?(y/n)");
+					System.out.println("Accepter l'echange " + filename + " (" + fileSize + ")?(y/n)");
 					MyScanner.toFileAccept();
 					
 					synchronized (this) {

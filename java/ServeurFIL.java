@@ -22,7 +22,7 @@ class ServeurFIC implements Runnable {
 
 			File f	= createFic("./downloads/"+filename);
 			
-			System.out.println("Début du telechargement ...");
+			System.out.println("Debut du telechargement ...");
 			BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
 			br.read(buff);
 			
@@ -31,7 +31,7 @@ class ServeurFIC implements Runnable {
 			ecrivain.write("salut");
 			ecrivain.flush();
 
-			System.out.println("telechargement termine");
+			System.out.println("Telechargement termine");
 
 
 		} catch (IOException e) {
@@ -75,7 +75,7 @@ class ServeurFIC implements Runnable {
 			f.createNewFile();
 
 		}catch(Exception e){
-			System.out.println(e );
+			System.out.println(e);
 		}
 		return f;
 
