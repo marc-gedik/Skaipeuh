@@ -55,9 +55,10 @@ int j=1;
 
 				j++;
 				filename =filename.substring(0, filename.length()-1);
-				System.out.println(filename);			
 			}
+			f = new File(filename);
 			filename = f.getAbsolutePath();
+			
 			fileWriter = new FileWriter(f);
 			bf = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
