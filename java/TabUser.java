@@ -40,9 +40,9 @@ public class TabUser {
 
 	public void afficheEvent(String msg) {
 		System.out.print("\033c");
-		System.out.println("##################################");
+		System.out.println("====================================");
 		System.out.println(msg);
-		System.out.println("##################################\n");
+		System.out.println("====================================\n");
 		this.afficheUserConnect(false);
 	}
 
