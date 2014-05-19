@@ -25,11 +25,7 @@ public class ThreadREAD implements Runnable {
 			pw = new PrintWriter(new OutputStreamWriter(s.getOutputStream()));
 
 			while (ServeurTCP.running) {
-				try {
-					br.read(buff, 0, 3);
-				} catch (SocketException e) {
-					System.out.println("Erreur read prefixe du message\n"+e);
-				}
+				try {br.read(buff, 0, 3);} catch (SocketException e) {}
 
 				if (buff[0] == 'M' && buff[1] == 'S' && buff[2] == 'G') {
 					br.read();
@@ -107,7 +103,7 @@ public class ThreadREAD implements Runnable {
 	}
 
 	private void fichierAccepter(boolean b) {
-		System.out.println("Fichier " + (b ? "acceptee" : "refusee"));
+		System.out.println("Fichier " + (b ? "accepte" : "refuse"));
 		ThreadWRI.fichierAccepter = b;
 		synchronized (wri) {
 			wri.notify();
