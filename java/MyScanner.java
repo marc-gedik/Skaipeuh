@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 public class MyScanner implements Runnable {
 
-	public static final int SKAIPEUH = 0, CLIENT = 1, FILE = 2, FILE_ACCEPT = 3;
+	private static final int SKAIPEUH = 0, CLIENT = 1, FILE = 2, FILE_ACCEPT = 3;
 	private static int where;
 	private static Skaipeuh skaipeuh;
 	private static ThreadWRI client;
@@ -44,6 +44,8 @@ public class MyScanner implements Runnable {
 	}
 
 	public static void toMain() {
+		if(where == CLIENT)
+			skaipeuh.refresh();
 		where = SKAIPEUH;
 	}
 

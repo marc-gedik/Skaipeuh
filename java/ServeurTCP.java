@@ -3,7 +3,7 @@ import java.io.*;
 
 class ServeurTCP implements Runnable {
 
-	int port;
+	private int port;
 	static boolean running = true;
 
 	public ServeurTCP(int p) {
@@ -32,6 +32,8 @@ class ServeurTCP implements Runnable {
 
 				t1.start();
 				t2.run();
+				sRcv.close();
+				sSent.close();
 			}
 		} catch (IOException e) {
 			System.out.println("Erreur ServeurTCP\n" + e);

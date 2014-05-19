@@ -34,14 +34,14 @@ public class Bourrage {
 		return str.substring(0, str.length() - 1);
 	}
 
-	public static String leftBourrage(String mot, int taille, String motif){
+	public static String leftBourrage(String mot, int taille, String motif) {
 		return bourrage(mot, taille, motif, true);
 	}
-	
-	public static String rightBourrage(String mot, int taille, String motif){
+
+	public static String rightBourrage(String mot, int taille, String motif) {
 		return bourrage(mot, taille, motif, false);
 	}
-	
+
 	private static String bourrage(String mot, int taille, String motif,
 			boolean cote) {
 		int i;
@@ -59,6 +59,5 @@ public class Bourrage {
 			str += mot;
 
 		return str;
-
-}
+	}
 }

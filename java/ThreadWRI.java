@@ -9,7 +9,7 @@ public class ThreadWRI {
 	private File file;
 	private String filename;
 	private String adresse;
-	static boolean fichierAccepter;
+	boolean fichierAccepter;
 
 	public ThreadWRI(Socket s, String adresse) {
 		this.s = s;
@@ -27,6 +27,7 @@ public class ThreadWRI {
 		if (msg.equals("CLO")) {
 			pw.print("CLO");
 			pw.flush();
+			ServeurTCP.running = false;
 			close();
 		}
 
@@ -85,6 +86,7 @@ public class ThreadWRI {
 	}
 
 	private void close() {
+		System.out.println("Conversation terminee");
 		ServeurTCP.running = false;
 		MyScanner.toMain();
 		try {

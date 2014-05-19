@@ -2,8 +2,8 @@ import java.net.*;
 
 public class Skaipeuh {
 
-	public static final String IPgroup = "224.5.6.7";
-	public static final int PORTgroup = 9876;
+	private static final String IPgroup = "224.5.6.7";
+	private static final int PORTgroup = 9876;
 
 	private Recepteur recepteur;
 	private Emetteur emetteur;
@@ -19,7 +19,7 @@ public class Skaipeuh {
 		}
 	}
 
-	public Skaipeuh(String user, String port) {
+	private Skaipeuh(String user, String port) {
 		try {
 			String machine;
 			InetAddress localeAdresse;
@@ -98,6 +98,9 @@ public class Skaipeuh {
 					28);
 			lanceClient(adresse, adresse, Integer.parseInt(portUser));
 		}
-						
+	}
+
+	public void refresh() {
+		emetteur.lance("RFH");
 	}
 }

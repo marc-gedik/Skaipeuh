@@ -9,8 +9,8 @@ import java.net.UnknownHostException;
 
 public class SendFile implements Runnable {
 
-	String filename;
-	Socket socket;
+	private String filename;
+	private Socket socket;
 
 	public SendFile(String filename, int port, String adresse)
 			throws UnknownHostException, IOException {

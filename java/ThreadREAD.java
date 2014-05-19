@@ -3,7 +3,7 @@ import java.io.*;
 
 public class ThreadREAD implements Runnable {
 
-	Socket s;
+	private Socket s;
 	private boolean fileAccepted;
 	private ThreadWRI wri;
 
@@ -46,6 +46,8 @@ public class ThreadREAD implements Runnable {
 				else if (buff[0] == 'C' && buff[1] == 'L' && buff[2] == 'O') {
 					System.out.println("Conversation terminee");
 					ServeurTCP.running = false;
+					pw.close();
+					br.close();
 					s.close();
 					MyScanner.toMain();
 				} 
@@ -104,7 +106,7 @@ public class ThreadREAD implements Runnable {
 
 	private void fichierAccepter(boolean b) {
 		System.out.println("Fichier " + (b ? "accepte" : "refuse"));
-		ThreadWRI.fichierAccepter = b;
+		wri.fichierAccepter = b;
 		synchronized (wri) {
 			wri.notify();
 		}

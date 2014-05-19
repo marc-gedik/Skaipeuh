@@ -2,8 +2,8 @@ import java.net.*;
 
 public class Emetteur {
 
-	String IPgroup;
-	int PORTgroup;
+	private String IPgroup;
+	private int PORTgroup;
 
 	public Emetteur(String IPgroup, int PORTgroup) {
 		this.IPgroup = IPgroup;
