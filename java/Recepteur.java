@@ -29,6 +29,8 @@ public class Recepteur implements Runnable {
 			InetAddress bannisseur2 = null;
 			Emetteur emetteur = new Emetteur(IPgroup, PORTgroup);
 
+			tab.afficheUserConnect(true);
+
 			while (true) {
 				ms.receive(dp);
 				msg = new String(dp.getData(), 0, dp.getLength());

@@ -49,8 +49,6 @@ public class Skaipeuh {
 			t2 = new Thread(serveur);
 			t2.start();
 
-			recepteur.tab.afficheUserConnect(true);
-
 			new MyScanner(this);
 		
 		} catch (UnknownHostException e) {
