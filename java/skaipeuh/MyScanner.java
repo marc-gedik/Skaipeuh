@@ -63,4 +63,8 @@ public class MyScanner implements Runnable {
 	public static void toFileAccept() {
 		where = FILE_ACCEPT;
 	}
+
+    public static void communique(){
+	where != SKAIPEUH;
+    }
 }

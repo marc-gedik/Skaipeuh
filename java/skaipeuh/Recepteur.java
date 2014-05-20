@@ -37,7 +37,7 @@ public class Recepteur implements Runnable {
 				ms.receive(dp);
 				msg = new String(dp.getData(), 0, dp.getLength());
 
-				if (!(msg.substring(3).equals(IAM.substring(3)))) {
+				if (!MyScanner.communique() && !(msg.substring(3).equals(IAM.substring(3)))) {
 
 					if (msg.startsWith("HLO")) {
 						flag = false;
