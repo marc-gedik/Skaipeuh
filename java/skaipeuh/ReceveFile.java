@@ -1,3 +1,5 @@
+package skaipeuh;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
@@ -24,7 +26,7 @@ public class ReceveFile implements Runnable {
 		FileWriter fileWriter;
 		File f;
 		String dir;
-		String[] tab, mot, racine;
+		String[] tab;
 		char[] buff = new char[500];
 		int i = 0;
 		int j = 1;
@@ -43,18 +45,8 @@ public class ReceveFile implements Runnable {
 			else
 				filename = dir + "/" + filename;
 
-			// f = new File(filename);
-			while (new File(filename).exists()) {
-				mot = filename.split("\\.");
-				racine = mot[0].split("\\(\\d{0,}\\)");
+			filename = renameExist(filename);
 
-				filename = racine[0] + "(" + j + ").";
-				for (int k = 1; k < mot.length; k++)
-					filename += mot[k] + ".";
-
-				j++;
-				filename = filename.substring(0, filename.length() - 1);
-			}
 			f = new File(filename);
 			filename = f.getAbsolutePath();
 
@@ -75,5 +67,22 @@ public class ReceveFile implements Runnable {
 			e.printStackTrace();
 		}
 		System.out.println("Fichier enregistre a l'emplacement : " + filename);
+	}
+
+	public static String renameExist(String filename) {
+		int j = 0;
+		String[] mot, racine;
+		while (new File(filename).exists()) {
+			mot = filename.split("\\.");
+			racine = mot[0].split("\\(\\d{0,}\\)");
+
+			filename = racine[0] + "(" + j + ").";
+			for (int k = 1; k < mot.length; k++)
+				filename += mot[k] + ".";
+
+			j++;
+			filename = filename.substring(0, filename.length() - 1);
+		}
+		return filename;
 	}
 }

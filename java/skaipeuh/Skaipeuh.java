@@ -1,3 +1,5 @@
+package skaipeuh;
+
 import java.net.*;
 
 public class Skaipeuh {
@@ -9,17 +11,7 @@ public class Skaipeuh {
 	private Emetteur emetteur;
 	private String IAM, HLO, BYE, BAN;
 
-	public static void main(String[] args) {
-		if (args.length == 2) {
-			new Skaipeuh(args[0], args[1]);
-
-		} else {
-			System.out.println("Probleme avec les arguments ");
-			System.exit(0);
-		}
-	}
-
-	private Skaipeuh(String user, String port) {
+	public Skaipeuh(String user, String port) {
 		try {
 			String machine;
 			InetAddress localeAdresse;

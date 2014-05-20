@@ -1,3 +1,5 @@
+package skaipeuh;
+
 import java.util.Scanner;
 
 public class MyScanner implements Runnable {

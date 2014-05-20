@@ -1,7 +1,9 @@
+package skaipeuh;
+
 public class TabUser {
 
-	String[] tabUser = new String[100];
-	int nbEle;
+	private String[] tabUser = new String[100];
+	private int nbEle;
 
 	public TabUser() {
 		this.tabUser = new String[100];
@@ -16,8 +18,8 @@ public class TabUser {
 
 	public void afficheUserConnect(boolean erase) {
 		int i;
-		 if(erase)
-			 System.out.print("\033c");
+		if (erase)
+			System.out.print("\033c");
 
 		if (nbEle == 0) {
 			System.out.println("Personne n'est connectee");
@@ -87,5 +89,9 @@ public class TabUser {
 		else {
 			System.out.println("tabUser vide");
 		}
+	}
+	
+	public int getNbEle() {
+		return nbEle;
 	}
 }

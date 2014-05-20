@@ -1,3 +1,5 @@
+package skaipeuh;
+
 public class Bourrage {
 
 	public static String bourrageUser(String user) {
@@ -51,7 +53,9 @@ public class Bourrage {
 		else
 			str = mot;
 
-		if (mot.length() < taille)
+		if (mot.length() >= taille)
+			return mot.substring(0, taille);
+		else
 			for (i = 0; (i < taille - mot.length()); i++)
 				str += motif;
 
