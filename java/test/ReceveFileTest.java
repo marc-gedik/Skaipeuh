@@ -17,9 +17,9 @@ public class ReceveFileTest {
 		String fileNameExpected = "test_fic(0)";
 		File f = new File("test_fic");
 		try {
-			if (f.createNewFile()) {
-				assertTrue(ReceveFile.renameExist(fileName).equals(fileNameExpected));
-			}
+			f.createNewFile();
+			assertTrue(ReceveFile.renameExist(fileName)
+					.equals(fileNameExpected));
 			f.delete();
 		} catch (IOException e) {
 			e.printStackTrace();
